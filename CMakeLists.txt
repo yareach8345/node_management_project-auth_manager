@@ -13,10 +13,14 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(auth_manager main.cpp)
 target_link_libraries(auth_manager
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
 
