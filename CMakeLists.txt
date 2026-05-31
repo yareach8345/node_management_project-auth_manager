@@ -16,6 +16,12 @@ find_package(Qt6 COMPONENTS
 find_package(OpenSSL REQUIRED)
 
 add_executable(auth_manager src/main.cpp)
+
+target_include_directories(auth_manager
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 target_link_libraries(auth_manager
         Qt::Core
         Qt::Gui
