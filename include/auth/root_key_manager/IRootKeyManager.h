@@ -19,6 +19,10 @@ namespace auth_manager::auth {
         virtual void delete_keys() = 0;
 
         virtual bool is_key_loaded() = 0;
+
+        virtual const std::string& private_key_file_path() = 0;
+
+        virtual const std::string& public_key_file_path() = 0;
     };
 }
 

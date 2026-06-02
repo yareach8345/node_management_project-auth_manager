@@ -7,22 +7,26 @@
 #include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
 
 #include <iostream>
-#include <ostream>
 #include <filesystem>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
 namespace auth_manager::auth {
-    RootKeyManagerOpenSSLImpl::RootKeyManagerOpenSSLImpl(): _is_key_loaded(false) {
+    RootKeyManagerOpenSSLImpl::RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config):
+        _private_key_file_path((auth_config.file_base() + "/root_private_key.pem")),
+        _public_key_file_path((auth_config.file_base() + "/root_public_key.pem")),
+        _is_key_loaded(false)
+    {
         ERR_load_crypto_strings();
         OpenSSL_add_all_algorithms();
 
-        try {
+        const bool is_private_key_file_exists = std::filesystem::exists(_private_key_file_path);
+        const bool is_public_key_file_exists = std::filesystem::exists(_public_key_file_path);
+
+        if (is_private_key_file_exists && is_public_key_file_exists) {
             RootKeyManagerOpenSSLImpl::load_keys();
             _is_key_loaded = true;
-        } catch (std::runtime_error &e) {
-            std::cerr << e.what() << std::endl;
         }
     };
 
@@ -67,25 +71,30 @@ namespace auth_manager::auth {
         }
     }
 
-    void RootKeyManagerOpenSSLImpl::extract_keys(const EVP_PKEY *pkey) {
+    void RootKeyManagerOpenSSLImpl::extract_keys(const EVP_PKEY *pkey) const {
         if (pkey == nullptr) {
             throw std::runtime_error("save keys error pkey is null");
         }
 
-        if (FILE *private_file = fopen("root_private_key.pem", "wb")) {
+        if (FILE *private_file = fopen(_private_key_file_path.c_str(), "wb")) {
             PEM_write_PrivateKey(private_file, pkey, nullptr, nullptr, 0, nullptr, nullptr);
             fclose(private_file);
+        } else {
+            perror("fopen");
         }
-        if (FILE *public_file = fopen("root_public_key.pem", "wb")) {
+
+        if (FILE *public_file = fopen(_public_key_file_path.c_str(), "wb")) {
             PEM_write_PrivateKey(public_file, pkey, nullptr, nullptr, 0, nullptr, nullptr);
             fclose(public_file);
+        } else {
+            perror("fopen");
         }
     }
 
     void RootKeyManagerOpenSSLImpl::load_keys() {
         free_keys();
 
-        FILE* private_key_fp = fopen("root_private_key.pem", "r");
+        FILE* private_key_fp = fopen(_private_key_file_path.c_str(), "r");
         if (!private_key_fp) {
             throw std::runtime_error("failed to open root private key file");
         }
@@ -93,7 +102,7 @@ namespace auth_manager::auth {
         _private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
         fclose(private_key_fp);
 
-        FILE* public_key_fp = fopen("root_public_key.pem", "r");
+        FILE* public_key_fp = fopen(_public_key_file_path.c_str(), "r");
         if (!public_key_fp) {
             throw std::runtime_error("failed to open root public key file");
         }
@@ -112,14 +121,22 @@ namespace auth_manager::auth {
     void RootKeyManagerOpenSSLImpl::delete_keys() {
         free_keys();
 
-        std::filesystem::remove("root_private_key.pem");
+        std::filesystem::remove(_private_key_file_path);
 
-        std::filesystem::remove("root_public_key.pem");
+        std::filesystem::remove(_public_key_file_path);
 
         _is_key_loaded = false;
     }
 
     bool RootKeyManagerOpenSSLImpl::is_key_loaded() {
         return _is_key_loaded;
+    }
+
+    const std::string& RootKeyManagerOpenSSLImpl::private_key_file_path() {
+        return _private_key_file_path;
+    }
+
+    const std::string& RootKeyManagerOpenSSLImpl::public_key_file_path() {
+        return _public_key_file_path;
     }
 }

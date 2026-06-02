@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     const auth_manager::auth::AuthConfig auth_config(config);
     std::cout << auth_config.file_base() << std::endl;
 
-    auth_manager::auth::RootKeyManagerOpenSSLImpl openSSL;
+    auth_manager::auth::RootKeyManagerOpenSSLImpl openSSL(auth_config);
 
     QApplication a(argc, argv);
 
