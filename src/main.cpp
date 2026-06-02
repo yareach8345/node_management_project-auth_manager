@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QPushButton>
 
-#include "auth/RootKeyManagerOpenSSLImpl.h"
+#include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
 
 int main(int argc, char *argv[]) {
     auth_manager::auth::RootKeyManagerOpenSSLImpl openSSL;

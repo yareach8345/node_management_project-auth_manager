@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-#include "auth/RootKeyManagerOpenSSLImpl.h"
+#include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
 
 #include <iostream>
 #include <ostream>

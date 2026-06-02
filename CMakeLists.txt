@@ -16,8 +16,8 @@ find_package(Qt6 COMPONENTS
 find_package(OpenSSL REQUIRED)
 
 add_executable(auth_manager src/main.cpp
-        include/auth/IRootKeyManager.h
-        include/auth/RootKeyManagerOpenSSLImpl.h
+        include/auth/root_key_manager/IRootKeyManager.h
+        include/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h
         src/auth/RootKeyManagerOpenSSLImpl.cpp
 )
 
