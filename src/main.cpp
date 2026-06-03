@@ -4,7 +4,7 @@
 
 #include "auth/config/AuthConfig.h"
 #include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
-#include "gui/GuiWindow.h"
+#include "gui/GuiWidget.h"
 
 int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
 
-    auth_manager::gui::GuiWindow window;
+    auth_manager::gui::GuiWidget window;
     window.setFixedSize(500, 500);
     window.show();
 

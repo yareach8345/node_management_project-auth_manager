@@ -22,8 +22,8 @@ add_executable(auth_manager src/main.cpp
         src/auth/root_key_manager/RootKeyManagerOpenSSLImpl.cpp
         include/auth/config/AuthConfig.h
         src/auth/config/AuthConfig.cpp
-        include/gui/GuiWindow.h
-        src/gui/GuiWindow.cpp
+        include/gui/GuiWidget.h
+        src/gui/GuiWidget.cpp
 )
 
 target_include_directories(auth_manager
