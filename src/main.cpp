@@ -1,10 +1,10 @@
 #include <iostream>
 #include <QApplication>
-#include <QPushButton>
 #include <yaml-cpp/yaml.h>
 
 #include "auth/config/AuthConfig.h"
 #include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
+#include "gui/GuiWindow.h"
 
 int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
@@ -17,23 +17,9 @@ int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
 
-    QPushButton button("button", nullptr);
-    auto update_button_title = [&] {
-        button.setText(openSSL.is_key_loaded() ? "delete keys" : "generate keys");
-    };
-    update_button_title();
+    auth_manager::gui::GuiWindow window;
+    window.setFixedSize(500, 500);
+    window.show();
 
-    QObject::connect(&button, &QPushButton::clicked, [&] {
-        if (openSSL.is_key_loaded()) {
-            openSSL.delete_keys();
-            update_button_title();
-        } else {
-            openSSL.update_keys();
-            update_button_title();
-        }
-    });
-
-    button.resize(200, 100);
-    button.show();
     return QApplication::exec();
 }
