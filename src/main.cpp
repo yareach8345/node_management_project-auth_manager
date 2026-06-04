@@ -1,6 +1,8 @@
 #include <iostream>
 #include <QApplication>
+#include <QLabel>
 #include <yaml-cpp/yaml.h>
+#include "auth_manager/gui/TabInfo.h"
 
 #include "auth_manager/auth/config/AuthConfig.h"
 #include "auth_manager/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
@@ -18,7 +20,17 @@ int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
 
-    auth_manager::gui::GuiWidget window;
+    auth_manager::gui::TabInfo tab1 {
+        .widget = new QLabel("hello world"),
+        .tab_name = "hello"
+    };
+
+    auth_manager::gui::TabInfo tab2 {
+        .widget = new QLabel("bye world"),
+        .tab_name = "bye"
+    };
+
+    auth_manager::gui::GuiWidget window{ { tab1, tab2 } };
     window.setFixedSize(500, 500);
     window.show();
 
