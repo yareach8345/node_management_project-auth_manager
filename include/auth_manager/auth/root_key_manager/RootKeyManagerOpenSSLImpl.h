@@ -6,7 +6,7 @@
 #define AUTH_MANAGER_ROOT_KEY_MANAGER_OPENSSL_IMPL_H
 
 #include "IRootKeyManager.h"
-#include "auth/config/AuthConfig.h"
+#include "auth_manager/auth/config/AuthConfig.h"
 #include "RootKeysInfo.h"
 #include <openssl/evp.h>
 #include <optional>

@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-#include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
+#include "auth_manager/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
 
 #include <iostream>
 #include <filesystem>
@@ -16,8 +16,8 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 
-#include "auth/root_key_manager/RootKeysInfo.h"
-#include "util/JsonUtil.h"
+#include "auth_manager/auth/root_key_manager/RootKeysInfo.h"
+#include "auth_manager/util/JsonUtil.h"
 
 namespace auth_manager::auth {
     RootKeyManagerOpenSSLImpl::RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config):

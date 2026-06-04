@@ -2,9 +2,9 @@
 #include <QApplication>
 #include <yaml-cpp/yaml.h>
 
-#include "auth/config/AuthConfig.h"
-#include "auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
-#include "gui/GuiWidget.h"
+#include "auth_manager/auth/config/AuthConfig.h"
+#include "auth_manager/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
+#include "auth_manager/gui/GuiWidget.h"
 
 int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);

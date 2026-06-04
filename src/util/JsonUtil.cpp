@@ -2,7 +2,7 @@
 // Created by yareach on 26. 6. 4..
 //
 
-#include "util/JsonUtil.h"
+#include "auth_manager/util/JsonUtil.h"
 #include <fstream>
 #include <iostream>
 

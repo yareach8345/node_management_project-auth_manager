@@ -2,10 +2,10 @@
 // Created by yareach on 26. 6. 4..
 //
 
-#include <nlohmann/json.hpp>
-
 #ifndef AUTH_MANAGER_JSON_UTIl_H
 #define AUTH_MANAGER_JSON_UTIl_H
+
+#include <nlohmann/json.hpp>
 
 namespace auth_manager::util {
     class JsonUtil {

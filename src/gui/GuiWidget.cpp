@@ -2,7 +2,7 @@
 // Created by yareach on 26. 6. 3..
 //
 
-#include "gui/GuiWidget.h"
+#include "auth_manager/gui/GuiWidget.h"
 
 #include <QtWidgets/QLabel>
 
