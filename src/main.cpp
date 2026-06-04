@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     std::cout << auth_config.file_base() << std::endl;
 
     auth_manager::auth::RootKeyManagerOpenSSLImpl openSSL(auth_config);
+    openSSL.generate_new_keys();
 
     QApplication a(argc, argv);
 

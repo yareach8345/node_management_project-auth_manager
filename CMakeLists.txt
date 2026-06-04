@@ -28,6 +28,8 @@ add_executable(auth_manager src/main.cpp
         include/auth/root_key_manager/RootKeysInfo.h
         include/auth/root_key_manager/RootKeysInfo.h
         src/auth/root_key_manager/RootKeysInfo.cpp
+        include/util/JsonUtil.h
+        src/util/JsonUtil.cpp
 )
 
 target_include_directories(auth_manager

@@ -11,20 +11,29 @@
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include <chrono>
+#include <format>
+#include <nlohmann/json.hpp>
+
+#include "auth/root_key_manager/RootKeysInfo.h"
+#include "util/JsonUtil.h"
 
 namespace auth_manager::auth {
     RootKeyManagerOpenSSLImpl::RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config):
         _private_key_file_path((auth_config.file_base() + "/root_private_key.pem")),
         _public_key_file_path((auth_config.file_base() + "/root_public_key.pem")),
-        _is_key_loaded(false)
+        _keys_info_file_path((auth_config.file_base() + "/root_keys_info.json")),
+        _is_key_loaded(false),
+        _root_keys_info(std::nullopt)
     {
         ERR_load_crypto_strings();
         OpenSSL_add_all_algorithms();
 
         const bool is_private_key_file_exists = std::filesystem::exists(_private_key_file_path);
         const bool is_public_key_file_exists = std::filesystem::exists(_public_key_file_path);
+        const bool is_keys_info_file_exists = std::filesystem::exists(_keys_info_file_path);
 
-        if (is_private_key_file_exists && is_public_key_file_exists) {
+        if (is_private_key_file_exists && is_public_key_file_exists && is_keys_info_file_exists) {
             RootKeyManagerOpenSSLImpl::load_keys();
             _is_key_loaded = true;
         }
@@ -55,6 +64,12 @@ namespace auth_manager::auth {
         }
 
         extract_keys(pkey);
+
+        const auto now = std::chrono::system_clock::now();
+        const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
+        nlohmann::json keys_info_json = RootKeysInfo(created_at).to_json();
+        util::JsonUtil::save_json_file(_keys_info_file_path, keys_info_json);
+
         load_keys();
 
         EVP_PKEY_CTX_free(ctx);
@@ -110,6 +125,8 @@ namespace auth_manager::auth {
         _public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
         fclose(public_key_fp);
 
+        _root_keys_info = RootKeysInfo::from_json(util::JsonUtil::load_json_file(_keys_info_file_path));
+
         _is_key_loaded = true;
     }
 
@@ -138,5 +155,13 @@ namespace auth_manager::auth {
 
     const std::string& RootKeyManagerOpenSSLImpl::public_key_file_path() {
         return _public_key_file_path;
+    }
+
+    const std::string& RootKeyManagerOpenSSLImpl::keys_info_file_path() {
+        return _keys_info_file_path;
+    }
+
+    const std::optional<RootKeysInfo>& RootKeyManagerOpenSSLImpl::root_keys_info() {
+        return _root_keys_info;
     }
 }
