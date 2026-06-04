@@ -15,6 +15,7 @@ find_package(Qt6 COMPONENTS
 
 find_package(OpenSSL REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(auth_manager src/main.cpp
         include/auth/root_key_manager/IRootKeyManager.h
@@ -24,6 +25,9 @@ add_executable(auth_manager src/main.cpp
         src/auth/config/AuthConfig.cpp
         include/gui/GuiWidget.h
         src/gui/GuiWidget.cpp
+        include/auth/root_key_manager/RootKeysInfo.h
+        include/auth/root_key_manager/RootKeysInfo.h
+        src/auth/root_key_manager/RootKeysInfo.cpp
 )
 
 target_include_directories(auth_manager
@@ -38,6 +42,7 @@ target_link_libraries(auth_manager
         OpenSSL::SSL
         OpenSSL::Crypto
         yaml-cpp::yaml-cpp
+        nlohmann_json::nlohmann_json
 )
 
 # config 파일 위치
