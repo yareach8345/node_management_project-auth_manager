@@ -14,6 +14,7 @@
 #include <chrono>
 #include <format>
 #include <nlohmann/json.hpp>
+#include <algorithm>
 
 #include "auth/root_key_manager/RootKeysInfo.h"
 #include "util/JsonUtil.h"
@@ -29,11 +30,18 @@ namespace auth_manager::auth {
         ERR_load_crypto_strings();
         OpenSSL_add_all_algorithms();
 
-        const bool is_private_key_file_exists = std::filesystem::exists(_private_key_file_path);
-        const bool is_public_key_file_exists = std::filesystem::exists(_public_key_file_path);
-        const bool is_keys_info_file_exists = std::filesystem::exists(_keys_info_file_path);
+        const std::string_view required_files[] = {
+            _private_key_file_path,
+            _public_key_file_path,
+            _keys_info_file_path,
+        };
 
-        if (is_private_key_file_exists && is_public_key_file_exists && is_keys_info_file_exists) {
+        const bool is_all_required_files_exist = std::ranges::all_of(
+            required_files,
+            [](const std::string_view file_path) { return std::filesystem::exists(file_path); }
+        );
+
+        if (is_all_required_files_exist) {
             RootKeyManagerOpenSSLImpl::load_keys();
             _is_key_loaded = true;
         }
