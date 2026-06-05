@@ -20,16 +20,16 @@
 #include "auth_manager/util/JsonUtil.h"
 
 namespace auth_manager::auth {
+    void RootKeyManagerOpenSSLImpl::EVP_PKEY_Deleter::operator()(EVP_PKEY *p) const {
+        EVP_PKEY_free(p);
+    }
+
     RootKeyManagerOpenSSLImpl::RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config):
         _private_key_file_path((auth_config.file_base() + "/root_private_key.pem")),
         _public_key_file_path((auth_config.file_base() + "/root_public_key.pem")),
         _keys_info_file_path((auth_config.file_base() + "/root_keys_info.json")),
-        _is_key_loaded(false),
         _root_keys_info(std::nullopt)
     {
-        ERR_load_crypto_strings();
-        OpenSSL_add_all_algorithms();
-
         const std::string_view required_files[] = {
             _private_key_file_path,
             _public_key_file_path,
@@ -43,13 +43,10 @@ namespace auth_manager::auth {
 
         if (is_all_required_files_exist) {
             RootKeyManagerOpenSSLImpl::load_keys();
-            _is_key_loaded = true;
         }
     };
 
-    RootKeyManagerOpenSSLImpl::~RootKeyManagerOpenSSLImpl() {
-        free_keys();
-    }
+    RootKeyManagerOpenSSLImpl::~RootKeyManagerOpenSSLImpl() = default;
 
     void RootKeyManagerOpenSSLImpl::generate_new_keys() {
         EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
@@ -75,7 +72,7 @@ namespace auth_manager::auth {
 
         const auto now = std::chrono::system_clock::now();
         const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
-        nlohmann::json keys_info_json = RootKeysInfo(created_at).to_json();
+        const nlohmann::json keys_info_json = RootKeysInfo(created_at).to_json();
         util::JsonUtil::save_json_file(_keys_info_file_path, keys_info_json);
 
         load_keys();
@@ -83,15 +80,10 @@ namespace auth_manager::auth {
         EVP_PKEY_CTX_free(ctx);
     }
 
-    void RootKeyManagerOpenSSLImpl::free_keys() {
-        if (_private_key != nullptr) {
-            EVP_PKEY_free(_private_key);
-            _private_key = nullptr;
-        }
-        if (_public_key != nullptr) {
-            EVP_PKEY_free(_public_key);
-            _public_key = nullptr;
-        }
+    void RootKeyManagerOpenSSLImpl::clear() {
+        _private_key.reset();
+        _public_key.reset();
+        _root_keys_info.reset();
     }
 
     void RootKeyManagerOpenSSLImpl::extract_keys(const EVP_PKEY *pkey) const {
@@ -107,7 +99,7 @@ namespace auth_manager::auth {
         }
 
         if (FILE *public_file = fopen(_public_key_file_path.c_str(), "wb")) {
-            PEM_write_PrivateKey(public_file, pkey, nullptr, nullptr, 0, nullptr, nullptr);
+            PEM_write_PUBKEY(public_file, pkey);
             fclose(public_file);
         } else {
             perror("fopen");
@@ -115,27 +107,30 @@ namespace auth_manager::auth {
     }
 
     void RootKeyManagerOpenSSLImpl::load_keys() {
-        free_keys();
+        clear();
 
+        // read Private Key
         FILE* private_key_fp = fopen(_private_key_file_path.c_str(), "r");
         if (!private_key_fp) {
             throw std::runtime_error("failed to open root private key file");
         }
 
-        _private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
+        const auto read_private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
+        _private_key.reset(read_private_key);
         fclose(private_key_fp);
 
+        // read Public Key
         FILE* public_key_fp = fopen(_public_key_file_path.c_str(), "r");
         if (!public_key_fp) {
             throw std::runtime_error("failed to open root public key file");
         }
 
-        _public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
+        const auto read_public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
+        _public_key.reset(read_public_key);
         fclose(public_key_fp);
 
+        //read root keys info
         _root_keys_info = RootKeysInfo::from_json(util::JsonUtil::load_json_file(_keys_info_file_path));
-
-        _is_key_loaded = true;
     }
 
     void RootKeyManagerOpenSSLImpl::update_keys() {
@@ -144,32 +139,40 @@ namespace auth_manager::auth {
     }
 
     void RootKeyManagerOpenSSLImpl::delete_keys() {
-        free_keys();
+        clear();
 
         std::filesystem::remove(_private_key_file_path);
 
         std::filesystem::remove(_public_key_file_path);
 
-        _is_key_loaded = false;
+        std::filesystem::remove(_keys_info_file_path);
     }
 
-    bool RootKeyManagerOpenSSLImpl::is_key_loaded() {
-        return _is_key_loaded;
+    bool RootKeyManagerOpenSSLImpl::is_key_loaded() const {
+        return _private_key && _public_key && _root_keys_info;
     }
 
-    const std::string& RootKeyManagerOpenSSLImpl::private_key_file_path() {
+    std::string_view RootKeyManagerOpenSSLImpl::private_key_file_path() const {
         return _private_key_file_path;
     }
 
-    const std::string& RootKeyManagerOpenSSLImpl::public_key_file_path() {
+    const EVP_PKEY* RootKeyManagerOpenSSLImpl::private_key() const {
+        return _private_key.get();
+    }
+
+    std::string_view RootKeyManagerOpenSSLImpl::public_key_file_path() const {
         return _public_key_file_path;
     }
 
-    const std::string& RootKeyManagerOpenSSLImpl::keys_info_file_path() {
+    const EVP_PKEY* RootKeyManagerOpenSSLImpl::public_key() const {
+        return _public_key.get();
+    }
+
+    std::string_view RootKeyManagerOpenSSLImpl::keys_info_file_path() const {
         return _keys_info_file_path;
     }
 
-    const std::optional<RootKeysInfo>& RootKeyManagerOpenSSLImpl::root_keys_info() {
+    const std::optional<RootKeysInfo>& RootKeyManagerOpenSSLImpl::root_keys_info() const {
         return _root_keys_info;
     }
 }

@@ -12,45 +12,43 @@
 #include <optional>
 
 namespace auth_manager::auth {
-    class RootKeyManagerOpenSSLImpl : public IRootKeyManager {
+    class RootKeyManagerOpenSSLImpl : public IRootKeyManager<const EVP_PKEY*, const EVP_PKEY*> {
     private:
+        struct EVP_PKEY_Deleter {
+            void operator()(EVP_PKEY* p) const;
+        };
+        using EVPKeyPointer = std::unique_ptr<EVP_PKEY, EVP_PKEY_Deleter>;
+
         const std::string _private_key_file_path;
-
         const std::string _public_key_file_path;
-
         const std::string _keys_info_file_path;
 
-        bool _is_key_loaded;
+        EVPKeyPointer _private_key = nullptr;
+        EVPKeyPointer _public_key = nullptr;
 
-        EVP_PKEY *_private_key = nullptr;
-        EVP_PKEY *_public_key = nullptr;
         std::optional<RootKeysInfo> _root_keys_info;
 
         void extract_keys(const EVP_PKEY *pkey) const;
-
-        void free_keys();
+        void clear();
     public:
         explicit RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config);
 
         ~RootKeyManagerOpenSSLImpl() override;
 
         void generate_new_keys() override;
-
         void load_keys() override;
-
         void update_keys() override;
-
         void delete_keys() override;
+        [[nodiscard]] bool is_key_loaded() const override;
 
-        bool is_key_loaded() override;
+        [[nodiscard]] std::string_view private_key_file_path() const override;
+        [[nodiscard]] const EVP_PKEY* private_key() const override;
 
-        const std::string& private_key_file_path() override;
+        [[nodiscard]] std::string_view public_key_file_path() const override;
+        [[nodiscard]] const EVP_PKEY* public_key() const override;
 
-        const std::string& public_key_file_path() override;
-
-        const std::string& keys_info_file_path() override;
-
-        const std::optional<RootKeysInfo>& root_keys_info();
+        [[nodiscard]] std::string_view keys_info_file_path() const override;
+        [[nodiscard]] const std::optional<RootKeysInfo>& root_keys_info() const override;
     };
 }
 
