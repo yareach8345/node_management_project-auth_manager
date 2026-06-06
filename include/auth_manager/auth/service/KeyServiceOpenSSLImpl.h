@@ -27,7 +27,7 @@ namespace auth_manager::auth {
         EVPKeyPointer _private_key = nullptr;
         EVPKeyPointer _public_key = nullptr;
 
-        std::optional<RootKeysInfo> _root_keys_info;
+        std::optional<KeysInfo> _keys_info;
 
         void extract_keys(const EVP_PKEY *pkey) const;
         void clear();
@@ -54,7 +54,7 @@ namespace auth_manager::auth {
         [[nodiscard]] std::string export_public_key() const override;
 
         [[nodiscard]] std::string_view keys_info_file_path() const override;
-        [[nodiscard]] std::optional<RootKeysInfo> root_keys_info() const override;
+        [[nodiscard]] std::optional<KeysInfo> keys_info() const override;
     };
 }
 

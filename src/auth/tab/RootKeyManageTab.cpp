@@ -14,7 +14,7 @@ namespace auth_manager::auth::gui {
         _test_label.setText(_root_key_service.get()->export_public_key().c_str());
 
         _main_layout.addWidget(&_key_info_viewer);
-        _key_info_viewer.setText(_root_key_service.get()->root_keys_info()->to_json().dump(4).c_str());
+        _key_info_viewer.setText(_root_key_service.get()->keys_info()->to_json().dump(4).c_str());
 
         setLayout(&_main_layout);
     }

@@ -20,10 +20,10 @@ namespace auth_manager::auth {
 
     KeyServiceOpenSSLImpl::KeyServiceOpenSSLImpl(const AuthConfig &auth_config, std::string key_name):
         _key_name(std::move(key_name)),
-        _private_key_file_path(auth_config.file_base() + "/" + key_name + "/root_private_key.pem"),
-        _public_key_file_path(auth_config.file_base() + "/" + key_name + "/root_public_key.pem"),
-        _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/root_keys_info.json"),
-        _root_keys_info(std::nullopt)
+        _private_key_file_path(auth_config.file_base() + "/" + key_name + "/private_key.pem"),
+        _public_key_file_path(auth_config.file_base() + "/" + key_name + "/public_key.pem"),
+        _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/keys_info.json"),
+        _keys_info(std::nullopt)
     {
         const std::string_view required_files[] = {
             _private_key_file_path,
@@ -67,7 +67,7 @@ namespace auth_manager::auth {
 
         const auto now = std::chrono::system_clock::now();
         const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
-        const nlohmann::json keys_info_json = RootKeysInfo(created_at).to_json();
+        const nlohmann::json keys_info_json = KeysInfo(created_at).to_json();
         util::JsonUtil::save_json_file(_keys_info_file_path, keys_info_json);
 
         load_keys();
@@ -78,7 +78,7 @@ namespace auth_manager::auth {
     void KeyServiceOpenSSLImpl::clear() {
         _private_key.reset();
         _public_key.reset();
-        _root_keys_info.reset();
+        _keys_info.reset();
     }
 
     void KeyServiceOpenSSLImpl::extract_keys(const EVP_PKEY *pkey) const {
@@ -107,7 +107,7 @@ namespace auth_manager::auth {
         // read Private Key
         FILE* private_key_fp = fopen(_private_key_file_path.c_str(), "r");
         if (!private_key_fp) {
-            throw std::runtime_error("failed to open root private key file");
+            throw std::runtime_error("failed to open private key file");
         }
 
         const auto read_private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
@@ -117,15 +117,15 @@ namespace auth_manager::auth {
         // read Public Key
         FILE* public_key_fp = fopen(_public_key_file_path.c_str(), "r");
         if (!public_key_fp) {
-            throw std::runtime_error("failed to open root public key file");
+            throw std::runtime_error("failed to open public key file");
         }
 
         const auto read_public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
         _public_key.reset(read_public_key);
         fclose(public_key_fp);
 
-        //read root keys info
-        _root_keys_info = RootKeysInfo::from_json(util::JsonUtil::load_json_file(_keys_info_file_path));
+        //read keys info
+        _keys_info = KeysInfo::from_json(util::JsonUtil::load_json_file(_keys_info_file_path));
     }
 
     void KeyServiceOpenSSLImpl::update_keys() {
@@ -200,7 +200,7 @@ namespace auth_manager::auth {
         return result == 1;
     }
 
-    bool KeyServiceOpenSSLImpl::is_key_loaded() const { return _private_key && _public_key && _root_keys_info; }
+    bool KeyServiceOpenSSLImpl::is_key_loaded() const { return _private_key && _public_key && _keys_info; }
 
     std::string_view KeyServiceOpenSSLImpl::key_name() const { return _key_name; }
 
@@ -225,5 +225,5 @@ namespace auth_manager::auth {
 
     std::string_view KeyServiceOpenSSLImpl::keys_info_file_path() const { return _keys_info_file_path; }
 
-    std::optional<RootKeysInfo> KeyServiceOpenSSLImpl::root_keys_info() const { return _root_keys_info; }
+    std::optional<KeysInfo> KeyServiceOpenSSLImpl::keys_info() const { return _keys_info; }
 }

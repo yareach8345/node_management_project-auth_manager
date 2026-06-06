@@ -26,7 +26,7 @@ add_executable(auth_manager src/main.cpp
         src/util/JsonUtil.cpp
         include/auth_manager/gui/TabInfo.h
         include/auth_manager/auth/service/IKeyService.h
-        src/auth/data/RootKeysInfo.cpp
+        src/auth/data/KeysInfo.cpp
         include/auth_manager/auth/service/KeyServiceOpenSSLImpl.h
         src/auth/service/KeyServiceOpenSSLImpl.cpp
         include/auth_manager/auth/tab/RootKeyManageTab.h

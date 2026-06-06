@@ -7,7 +7,7 @@
 #include <optional>
 #include <string_view>
 
-#include "auth_manager/auth/data/RootKeysInfo.h"
+#include "auth_manager/auth/data/KeysInfo.h"
 
 namespace auth_manager::auth {
     class IKeyService {
@@ -35,7 +35,7 @@ namespace auth_manager::auth {
         [[nodiscard]] virtual std::string export_public_key() const = 0;
 
         [[nodiscard]] virtual std::string_view keys_info_file_path() const = 0;
-        [[nodiscard]] virtual std::optional<RootKeysInfo> root_keys_info() const = 0;
+        [[nodiscard]] virtual std::optional<KeysInfo> keys_info() const = 0;
     };
 }
 
