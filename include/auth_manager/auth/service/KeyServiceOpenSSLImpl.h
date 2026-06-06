@@ -41,6 +41,10 @@ namespace auth_manager::auth {
         void update_keys() override;
         void delete_keys() override;
 
+        std::vector<unsigned char> sign(const std::string &message) override;
+
+        bool verify(const std::string& message, const std::vector<unsigned char>& signature) override;
+
         [[nodiscard]] std::string_view key_name() const override;
 
         [[nodiscard]] bool is_key_loaded() const override;

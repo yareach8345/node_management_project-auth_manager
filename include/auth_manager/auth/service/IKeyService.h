@@ -22,6 +22,10 @@ namespace auth_manager::auth {
 
         virtual void delete_keys() = 0;
 
+        virtual std::vector<unsigned char> sign(const std::string& message) = 0;
+
+        virtual bool verify(const std::string& message, const std::vector<unsigned char>& signature) = 0;
+
         [[nodiscard]] virtual std::string_view key_name() const = 0;
 
         [[nodiscard]] virtual bool is_key_loaded() const = 0;

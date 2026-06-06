@@ -141,6 +141,65 @@ namespace auth_manager::auth {
         std::filesystem::remove(_keys_info_file_path);
     }
 
+    std::vector<unsigned char> KeyServiceOpenSSLImpl::sign(const std::string &message) {
+        EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+
+        if (!ctx)
+            throw std::runtime_error("EVP_MD_CTX_new failed");
+
+        if (EVP_DigestSignInit(ctx, nullptr, EVP_sha256(), nullptr, _private_key.get()) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            throw std::runtime_error("EVP_DigestSignInit failed");
+        }
+
+        if (EVP_DigestSignUpdate(ctx, message.data(), message.size()) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            throw std::runtime_error("EVP_DigestSignUpdate failed");
+        }
+
+        size_t signature_length = 0;
+
+        if (EVP_DigestSignFinal(ctx, nullptr, &signature_length) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            throw std::runtime_error("EVP_DigestSignFinal failed");
+        }
+
+        std::vector<unsigned char> signature(signature_length);
+
+        if (EVP_DigestSignFinal(ctx, signature.data(), &signature_length) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            throw std::runtime_error("EVP_DigestSignFinal failed");
+        }
+
+        signature.resize(signature_length);
+
+        EVP_MD_CTX_free(ctx);
+
+        return signature;
+    }
+
+    bool KeyServiceOpenSSLImpl::verify(const std::string &message, const std::vector<unsigned char> &signature) {
+        EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+
+        if (!ctx) return false;
+
+        if (EVP_DigestVerifyInit(ctx, nullptr, EVP_sha256(), nullptr, _public_key.get()) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            return false;
+        }
+
+        if (EVP_DigestVerifyUpdate(ctx, message.data(), message.size()) <= 0) {
+            EVP_MD_CTX_free(ctx);
+            return false;
+        }
+
+        const int result = EVP_DigestVerifyFinal(ctx, signature.data(), signature.size());
+
+        EVP_MD_CTX_free(ctx);
+
+        return result == 1;
+    }
+
     bool KeyServiceOpenSSLImpl::is_key_loaded() const { return _private_key && _public_key && _root_keys_info; }
 
     std::string_view KeyServiceOpenSSLImpl::key_name() const { return _key_name; }

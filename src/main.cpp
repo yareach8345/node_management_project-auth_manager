@@ -11,13 +11,16 @@
 
 int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
-    std::cout << CONFIG_FILE_PATH << std::endl;
-    std::cout << config["auth"]["file_base"].as<std::string>() << std::endl;
     const auth_manager::auth::AuthConfig auth_config(config);
-    std::cout << auth_config.file_base() << std::endl;
 
     std::unique_ptr<auth_manager::auth::IKeyService> ssl = std::make_unique<auth_manager::auth::KeyServiceOpenSSLImpl>(auth_config, "root");
     ssl->generate_new_keys();
+    std::cout << ssl->key_name() << std::endl;
+    std::cout << ssl->export_public_key() << std::endl;
+    const auto signed_h = ssl->sign("hello world!");
+
+    std::cout << (ssl->verify("hello world!", signed_h) ? "true" : "false") << std::endl;
+    std::cout << (ssl->verify("hello world", signed_h) ? "true" : "false") << std::endl;
 
     QApplication a(argc, argv);
 
