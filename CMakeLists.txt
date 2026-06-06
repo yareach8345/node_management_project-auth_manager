@@ -18,19 +18,17 @@ find_package(yaml-cpp REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 add_executable(auth_manager src/main.cpp
-        include/auth_manager/auth/root_key_manager/IRootKeyManager.h
-        include/auth_manager/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h
-        src/auth/root_key_manager/RootKeyManagerOpenSSLImpl.cpp
         include/auth_manager/auth/config/AuthConfig.h
         src/auth/config/AuthConfig.cpp
         include/auth_manager/gui/GuiWidget.h
         src/gui/GuiWidget.cpp
-        include/auth_manager/auth/root_key_manager/RootKeysInfo.h
-        include/auth_manager/auth/root_key_manager/RootKeysInfo.h
-        src/auth/root_key_manager/RootKeysInfo.cpp
         include/auth_manager/util/JsonUtil.h
         src/util/JsonUtil.cpp
         include/auth_manager/gui/TabInfo.h
+        include/auth_manager/auth/service/IKeyService.h
+        src/auth/dto/RootKeysInfo.cpp
+        include/auth_manager/auth/service/KeyServiceOpenSSLImpl.h
+        src/auth/service/KeyServiceOpenSSLImpl.cpp
 )
 
 target_include_directories(auth_manager

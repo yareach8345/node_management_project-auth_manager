@@ -1,18 +1,17 @@
 //
-// Created by yareach on 26. 5. 31..
+// Created by yareach on 26. 6. 7..
 //
 
-#ifndef AUTH_MANAGER_ROOT_KEY_MANAGER_OPENSSL_IMPL_H
-#define AUTH_MANAGER_ROOT_KEY_MANAGER_OPENSSL_IMPL_H
+#ifndef AUTH_MANAGER_KEY_SERVICE_OPENSSL_IMPL_H
+#define AUTH_MANAGER_KEY_SERVICE_OPENSSL_IMPL_H
 
-#include "IRootKeyManager.h"
-#include "auth_manager/auth/config/AuthConfig.h"
-#include "RootKeysInfo.h"
+#include "IKeyService.h"
 #include <openssl/evp.h>
-#include <optional>
+
+#include "auth_manager/auth/config/AuthConfig.h"
 
 namespace auth_manager::auth {
-    class RootKeyManagerOpenSSLImpl : public IRootKeyManager<const EVP_PKEY*, const EVP_PKEY*> {
+    class KeyServiceOpenSSLImpl : public IKeyService {
     private:
         struct EVP_PKEY_Deleter {
             void operator()(EVP_PKEY* p) const;
@@ -23,6 +22,8 @@ namespace auth_manager::auth {
         const std::string _public_key_file_path;
         const std::string _keys_info_file_path;
 
+        const std::string _key_name;
+
         EVPKeyPointer _private_key = nullptr;
         EVPKeyPointer _public_key = nullptr;
 
@@ -31,25 +32,26 @@ namespace auth_manager::auth {
         void extract_keys(const EVP_PKEY *pkey) const;
         void clear();
     public:
-        explicit RootKeyManagerOpenSSLImpl(const AuthConfig &auth_config);
+        explicit KeyServiceOpenSSLImpl(const AuthConfig &auth_config, std::string key_name);
 
-        ~RootKeyManagerOpenSSLImpl() override;
+        ~KeyServiceOpenSSLImpl() override;
 
         void generate_new_keys() override;
         void load_keys() override;
         void update_keys() override;
         void delete_keys() override;
+
+        [[nodiscard]] std::string_view key_name() const override;
+
         [[nodiscard]] bool is_key_loaded() const override;
 
         [[nodiscard]] std::string_view private_key_file_path() const override;
-        [[nodiscard]] const EVP_PKEY* private_key() const override;
-
         [[nodiscard]] std::string_view public_key_file_path() const override;
-        [[nodiscard]] const EVP_PKEY* public_key() const override;
+        [[nodiscard]] std::string export_public_key() const override;
 
         [[nodiscard]] std::string_view keys_info_file_path() const override;
-        [[nodiscard]] const std::optional<RootKeysInfo>& root_keys_info() const override;
+        [[nodiscard]] std::optional<RootKeysInfo> root_keys_info() const override;
     };
 }
 
-#endif //AUTH_MANAGER_ROOT_KEY_MANAGER_OPENSSL_IMPL_H
+#endif //AUTH_MANAGER_KEY_SERVICE_OPENSSL_IMPL_H

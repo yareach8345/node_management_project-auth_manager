@@ -5,7 +5,8 @@
 #include "auth_manager/gui/TabInfo.h"
 
 #include "auth_manager/auth/config/AuthConfig.h"
-#include "auth_manager/auth/root_key_manager/RootKeyManagerOpenSSLImpl.h"
+#include "auth_manager/auth/service/IKeyService.h"
+#include "auth_manager/auth/service/KeyServiceOpenSSLImpl.h"
 #include "auth_manager/gui/GuiWidget.h"
 
 int main(int argc, char *argv[]) {
@@ -15,8 +16,8 @@ int main(int argc, char *argv[]) {
     const auth_manager::auth::AuthConfig auth_config(config);
     std::cout << auth_config.file_base() << std::endl;
 
-    auth_manager::auth::RootKeyManagerOpenSSLImpl openSSL(auth_config);
-    openSSL.generate_new_keys();
+    std::unique_ptr<auth_manager::auth::IKeyService> ssl = std::make_unique<auth_manager::auth::KeyServiceOpenSSLImpl>(auth_config, "root");
+    ssl->generate_new_keys();
 
     QApplication a(argc, argv);
 
