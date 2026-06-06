@@ -17,7 +17,7 @@ namespace auth_manager::auth {
         virtual void update_keys() = 0;
         virtual void delete_keys() = 0;
 
-        virtual bool is_key_loaded() const = 0;
+        [[nodiscard]] virtual bool is_key_loaded() const = 0;
 
         [[nodiscard]] virtual std::string_view private_key_file_path() const = 0;
         [[nodiscard]] virtual PrivateKeyT private_key() const = 0;
