@@ -2,7 +2,7 @@
 // Created by yareach on 26. 6. 3..
 //
 
-#include "auth_manager/auth/dto/RootKeysInfo.h"
+#include "auth_manager/auth/data/RootKeysInfo.h"
 
 namespace auth_manager::auth {
     RootKeysInfo::RootKeysInfo(std::string created_at): _created_at(std::move(created_at)) {};

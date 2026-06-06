@@ -7,7 +7,7 @@
 #include <optional>
 #include <string_view>
 
-#include "auth_manager/auth/dto/RootKeysInfo.h"
+#include "auth_manager/auth/data/RootKeysInfo.h"
 
 namespace auth_manager::auth {
     class IKeyService {
