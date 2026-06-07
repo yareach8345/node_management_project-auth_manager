@@ -7,12 +7,13 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QTabWidget>
+#include <QPointer>
 #include "TabInfo.h"
 
 namespace auth_manager::gui {
     class GuiWidget : public QMainWindow {
     private:
-        QTabWidget _tab_widget;
+        QPointer<QTabWidget> _tab_widget = new QTabWidget;
 
         std::vector<TabInfo> _tabs;
     public:

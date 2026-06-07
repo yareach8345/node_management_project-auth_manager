@@ -35,13 +35,12 @@ int main(int argc, char *argv[]) {
         .tab_name = "bye"
     };
 
-    auth_manager::auth::gui::RootKeyManageTab tab(ssl);
     auth_manager::gui::TabInfo tab3 {
-        .widget = &tab,
+        .widget = new auth_manager::auth::gui::RootKeyManageTab(ssl),
         .tab_name = "root_key_manage(test)"
     };
 
-    auth_manager::gui::GuiWidget window{ { tab1, tab2, tab3 } };
+    auth_manager::gui::GuiWidget window{{ tab1, tab2, tab3 }};
     window.setFixedSize(500, 500);
     window.show();
 

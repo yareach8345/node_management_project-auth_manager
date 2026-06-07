@@ -11,16 +11,18 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QPushButton>
+#include <QtCore/QPointer>
 #include <memory>
+
 #include "auth_manager/auth/service/IKeyService.h"
 
 namespace auth_manager::auth::gui {
     class RootKeyManageTab: public QWidget {
         Q_OBJECT
     private:
-        QLabel _test_label;
-        QVBoxLayout _main_layout;
-        QTextBrowser _key_info_viewer;
+        QPointer<QVBoxLayout> _main_layout = new QVBoxLayout(this);
+        QPointer<QLabel> _test_label = new QLabel;
+        QPointer<QTextBrowser> _key_info_viewer = new QTextBrowser;
 
         std::shared_ptr<IKeyService> _root_key_service;
 

@@ -7,10 +7,11 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCore/QString>
+#include <QtCore/QPointer>
 
 namespace auth_manager::gui {
     struct TabInfo {
-        QWidget *widget;
+        QPointer<QWidget> widget;
         QString tab_name;
     };
 }
