@@ -25,14 +25,8 @@ namespace auth_manager::auth {
         _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/keys_info.json"),
         _keys_info(std::nullopt)
     {
-        const std::string_view required_files[] = {
-            _private_key_file_path,
-            _public_key_file_path,
-            _keys_info_file_path,
-        };
-
         const bool is_all_required_files_exist = std::ranges::all_of(
-            required_files,
+            required_files(),
             [](const std::string_view file_path) { return std::filesystem::exists(file_path); }
         );
 
@@ -101,6 +95,10 @@ namespace auth_manager::auth {
         }
     }
 
+    std::array<std::string_view, 3> KeyServiceOpenSSLImpl::required_files() const {
+        return { _private_key_file_path, _public_key_file_path, _keys_info_file_path };
+    }
+
     void KeyServiceOpenSSLImpl::load_keys() {
         clear();
 
@@ -136,12 +134,18 @@ namespace auth_manager::auth {
     void KeyServiceOpenSSLImpl::delete_keys() {
         clear();
 
-        std::filesystem::remove(_private_key_file_path);
-        std::filesystem::remove(_public_key_file_path);
-        std::filesystem::remove(_keys_info_file_path);
+        for (std::string_view required_file : required_files()) {
+            if (std::filesystem::exists(required_file)) {
+                std::filesystem::remove(required_file);
+            }
+        }
     }
 
     std::vector<unsigned char> KeyServiceOpenSSLImpl::sign(const std::string &message) {
+        if (!is_key_loaded()) {
+            throw std::runtime_error("Key is not loaded");
+        }
+
         EVP_MD_CTX* ctx = EVP_MD_CTX_new();
 
         if (!ctx)
@@ -179,6 +183,10 @@ namespace auth_manager::auth {
     }
 
     bool KeyServiceOpenSSLImpl::verify(const std::string &message, const std::vector<unsigned char> &signature) {
+        if (!is_key_loaded()) {
+            throw std::runtime_error("Key is not loaded");
+        }
+
         EVP_MD_CTX* ctx = EVP_MD_CTX_new();
 
         if (!ctx) return false;
@@ -209,6 +217,10 @@ namespace auth_manager::auth {
     std::string_view KeyServiceOpenSSLImpl::public_key_file_path() const { return _public_key_file_path; }
 
     std::string KeyServiceOpenSSLImpl::export_public_key() const {
+        if (!is_key_loaded()) {
+            throw std::runtime_error("Key is not loaded");
+        }
+
         BIO* bio = BIO_new(BIO_s_mem());
 
         PEM_write_bio_PUBKEY(bio, _public_key.get());

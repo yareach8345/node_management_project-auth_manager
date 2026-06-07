@@ -30,7 +30,10 @@ namespace auth_manager::auth {
         std::optional<KeysInfo> _keys_info;
 
         void extract_keys(const EVP_PKEY *pkey) const;
+
         void clear();
+
+        [[nodiscard]] std::array<std::string_view, 3> required_files() const;
     public:
         explicit KeyServiceOpenSSLImpl(const AuthConfig &auth_config, std::string key_name);
 
