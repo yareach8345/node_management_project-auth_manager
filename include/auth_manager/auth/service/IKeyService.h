@@ -4,6 +4,8 @@
 
 #ifndef AUTH_MANAGER_I_KEY_SERVICE_H
 #define AUTH_MANAGER_I_KEY_SERVICE_H
+
+#include <vector>
 #include <optional>
 #include <string_view>
 

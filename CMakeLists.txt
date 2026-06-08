@@ -26,11 +26,13 @@ add_executable(auth_manager src/main.cpp
         src/util/JsonUtil.cpp
         include/auth_manager/gui/TabInfo.h
         include/auth_manager/auth/service/IKeyService.h
-        src/auth/data/KeysInfo.cpp
         include/auth_manager/auth/service/KeyServiceOpenSSLImpl.h
         src/auth/service/KeyServiceOpenSSLImpl.cpp
         include/auth_manager/auth/tab/RootKeyManageTab.h
         src/auth/tab/RootKeyManageTab.cpp
+        include/auth_manager/core/json/IJsonConverter.h
+        include/auth_manager/auth/mapping/KeysInfoJsonConverter.h
+        src/auth/mapping/KeysInfoJsonConverter.cpp
 )
 
 target_include_directories(auth_manager

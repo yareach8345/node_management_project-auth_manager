@@ -11,6 +11,7 @@
 #include <openssl/rsa.h>
 
 #include "auth_manager/auth/config/AuthConfig.h"
+#include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
 #include "auth_manager/util/JsonUtil.h"
 
 namespace auth_manager::auth {
@@ -61,7 +62,7 @@ namespace auth_manager::auth {
 
         const auto now = std::chrono::system_clock::now();
         const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
-        const nlohmann::json keys_info_json = KeysInfo(created_at).to_json();
+        const nlohmann::json keys_info_json = nlohmann::json::parse(KeysInfoJsonConverter::get_instance()->serialize(KeysInfo(created_at)));
         util::JsonUtil::save_json_file(_keys_info_file_path, keys_info_json);
 
         load_keys();
@@ -123,7 +124,7 @@ namespace auth_manager::auth {
         fclose(public_key_fp);
 
         //read keys info
-        _keys_info = KeysInfo::from_json(util::JsonUtil::load_json_file(_keys_info_file_path));
+        _keys_info = KeysInfoJsonConverter::get_instance()->deserialize(util::JsonUtil::load_json_file(_keys_info_file_path).dump());
     }
 
     void KeyServiceOpenSSLImpl::update_keys() {

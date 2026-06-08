@@ -4,6 +4,8 @@
 
 #include "auth_manager/auth/tab/RootKeyManageTab.h"
 
+#include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
+
 namespace auth_manager::auth::gui {
     RootKeyManageTab::RootKeyManageTab(const std::shared_ptr<IKeyService> &root_key_service):
         _root_key_service(root_key_service)
@@ -16,7 +18,7 @@ namespace auth_manager::auth::gui {
         _test_label->setText(_root_key_service.get()->export_public_key().c_str());
 
         _main_layout->addWidget(_key_info_viewer);
-        _key_info_viewer->setText(_root_key_service.get()->keys_info()->to_json().dump(4).c_str());
+        _key_info_viewer->setText(KeysInfoJsonConverter::get_instance()->serialize(_root_key_service.get()->keys_info().value(), 4).c_str());
 
         setLayout(_main_layout);
     }
