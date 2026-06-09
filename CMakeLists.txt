@@ -33,6 +33,7 @@ add_executable(auth_manager src/main.cpp
         include/auth_manager/core/json/IJsonConverter.h
         include/auth_manager/auth/mapping/KeysInfoJsonConverter.h
         src/auth/mapping/KeysInfoJsonConverter.cpp
+        include/auth_manager/core/json/JsonFileManager.h
 )
 
 target_include_directories(auth_manager

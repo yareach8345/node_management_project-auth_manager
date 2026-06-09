@@ -9,6 +9,8 @@
 #include <openssl/evp.h>
 
 #include "auth_manager/auth/config/AuthConfig.h"
+#include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
+#include "auth_manager/core/json/JsonFileManager.h"
 
 namespace auth_manager::auth {
     class KeyServiceOpenSSLImpl : public IKeyService {
@@ -32,6 +34,8 @@ namespace auth_manager::auth {
         void extract_keys(const EVP_PKEY *pkey) const;
 
         void clear();
+
+        std::shared_ptr<core::json::JsonFileManager<KeysInfo>> _json_file_manager;
 
         [[nodiscard]] std::array<std::string_view, 3> required_files() const;
     public:
