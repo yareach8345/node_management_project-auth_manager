@@ -32,6 +32,10 @@ add_executable(auth_manager src/main.cpp
         include/auth_manager/auth/mapping/KeysInfoJsonConverter.h
         src/auth/mapping/KeysInfoJsonConverter.cpp
         include/auth_manager/core/json/JsonFileManager.h
+        include/auth_manager/auth/key_provider/KeyProvider.h
+        src/auth/key_provider/KeyProvider.cpp
+        include/auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h
+        src/auth/key_provider/KeyProviderOpenSSLImpl.cpp
 )
 
 target_include_directories(auth_manager
