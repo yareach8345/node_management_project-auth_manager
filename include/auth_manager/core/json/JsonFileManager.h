@@ -9,32 +9,40 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <string_view>
 #include "IJsonConverter.h"
 
 namespace auth_manager::core::json {
     template<typename T>
     class JsonFileManager {
     private:
+        std::string file_path;
+
         std::shared_ptr<IJsonConverter<T>> jsonConverter;
     public:
-        explicit JsonFileManager(std::shared_ptr<IJsonConverter<T>> jsonConverter);
+        explicit JsonFileManager(std::string file_path, std::shared_ptr<IJsonConverter<T>> jsonConverter);
 
-        T read_from_file(std::string_view file_name) const;
+        bool exists() const;
 
-        void write_to_file(std::string_view file_name, T data, unsigned int indent = 0) const;
+        T read_from_file() const;
 
-        void delete_file(std::string_view file_name) const;
+        void write_to_file(T data, unsigned int indent = 0) const;
+
+        void delete_file() const;
     };
 
     template<typename T>
-    JsonFileManager<T>::JsonFileManager(std::shared_ptr<IJsonConverter<T>> jsonConverter): jsonConverter(jsonConverter) {}
+    JsonFileManager<T>::JsonFileManager(std::string file_path, std::shared_ptr<IJsonConverter<T>> jsonConverter): file_path(std::move(file_path)), jsonConverter(jsonConverter) {}
 
     template<typename T>
-    T JsonFileManager<T>::read_from_file(const std::string_view file_name) const {
-        std::ifstream file((file_name.data()));
+    bool JsonFileManager<T>::exists() const {
+        return std::filesystem::exists(file_path);
+    }
+
+    template<typename T>
+    T JsonFileManager<T>::read_from_file() const {
+        std::ifstream file(file_path);
         if (!file.is_open()) {
-            std::cerr << "JsonUtil::load_json_file failed: " << file_name << std::endl;
+            std::cerr << "JsonUtil::load_json_file failed: " << file_path << std::endl;
             throw std::runtime_error("JsonUtil::load_json_file failed");
         }
         std::stringstream ss;
@@ -45,10 +53,10 @@ namespace auth_manager::core::json {
     }
 
     template<typename T>
-    void JsonFileManager<T>::write_to_file(const std::string_view file_name, T data, unsigned int indent) const {
-        std::ofstream file((file_name.data()));
+    void JsonFileManager<T>::write_to_file(T data, unsigned int indent) const {
+        std::ofstream file(file_path);
         if (!file.is_open()) {
-            std::cerr << "JsonUtil::write_json_file failed: " << file_name << std::endl;
+            std::cerr << "JsonUtil::write_json_file failed: " << file_path << std::endl;
             throw std::runtime_error("JsonUtil::write_json_file failed");
         }
         const std::string result = jsonConverter->serialize(data, indent);
@@ -57,12 +65,12 @@ namespace auth_manager::core::json {
     }
 
     template<typename T>
-    void JsonFileManager<T>::delete_file(const std::string_view file_name) const {
-        if (!std::filesystem::exists(file_name)) {
-            std::cerr << "file is not exists" << file_name << std::endl;
+    void JsonFileManager<T>::delete_file() const {
+        if (!exists()) {
+            std::cerr << "file is not exists" << file_path << std::endl;
             throw std::runtime_error("File is not exists");
         }
-        std::filesystem::remove(file_name);
+        std::filesystem::remove(file_path);
     }
 }
 

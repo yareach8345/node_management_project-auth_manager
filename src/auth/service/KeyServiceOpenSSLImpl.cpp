@@ -25,7 +25,7 @@ namespace auth_manager::auth {
         _public_key_file_path(auth_config.file_base() + "/" + key_name + "/public_key.pem"),
         _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/keys_info.json"),
         _keys_info(std::nullopt),
-        _json_file_manager(new core::json::JsonFileManager(KeysInfoJsonConverter::get_instance()))
+        _json_file_manager(_keys_info_file_path, KeysInfoJsonConverter::get_instance())
     {
         const bool is_all_required_files_exist = std::ranges::all_of(
             required_files(),
@@ -63,7 +63,7 @@ namespace auth_manager::auth {
 
         const auto now = std::chrono::system_clock::now();
         const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
-        _json_file_manager->write_to_file(_keys_info_file_path, KeysInfo(created_at));
+        _json_file_manager.write_to_file(KeysInfo(created_at));
 
         load_keys();
 
@@ -124,7 +124,7 @@ namespace auth_manager::auth {
         fclose(public_key_fp);
 
         //read keys info
-        _keys_info = _json_file_manager->read_from_file(_keys_info_file_path);
+        _keys_info = _json_file_manager.read_from_file();
     }
 
     void KeyServiceOpenSSLImpl::update_keys() {
