@@ -15,7 +15,11 @@ namespace auth_manager::auth {
 
     std::string KeysInfoJsonConverter::serialize(const KeysInfo &data, const int indent) const {
         const nlohmann::json json = {{ "created_at", data.created_at }};
-        return json.dump(indent);
+        if (indent == 0) {
+            return json.dump();
+        } else {
+            return json.dump(indent);
+        }
     }
 
     KeysInfo KeysInfoJsonConverter::deserialize(std::string_view json_string) const {
