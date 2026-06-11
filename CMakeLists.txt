@@ -36,6 +36,8 @@ add_executable(auth_manager src/main.cpp
         src/auth/key_provider/KeyProvider.cpp
         include/auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h
         src/auth/key_provider/KeyProviderOpenSSLImpl.cpp
+        include/auth_manager/auth/util/OpenSSLUtil.h
+        src/auth/util/OpenSSLUtil.cpp
 )
 
 target_include_directories(auth_manager

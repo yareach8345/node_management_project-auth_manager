@@ -21,7 +21,7 @@ namespace auth_manager::core::json {
     public:
         explicit JsonFileManager(std::string file_path, std::shared_ptr<IJsonConverter<T>> jsonConverter);
 
-        bool exists() const;
+        [[nodiscard]] bool exists() const;
 
         T read_from_file() const;
 
