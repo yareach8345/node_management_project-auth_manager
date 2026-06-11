@@ -95,7 +95,7 @@ namespace auth_manager::auth::key_provider {
         fclose(public_key_fp);
     }
 
-    std::vector<unsigned char> KeyProviderOpenSSLImpl::sign_impl(const std::string &message) {
+    std::vector<std::byte> KeyProviderOpenSSLImpl::sign_impl(const std::string &message) {
         const std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free);
 
         if (!ctx)
@@ -115,9 +115,9 @@ namespace auth_manager::auth::key_provider {
             throw std::runtime_error("EVP_DigestSignFinal failed");
         }
 
-        std::vector<unsigned char> signature(signature_length);
+        std::vector<std::byte> signature(signature_length);
 
-        if (EVP_DigestSignFinal(ctx.get(), signature.data(), &signature_length) <= 0) {
+        if (EVP_DigestSignFinal(ctx.get(), reinterpret_cast<unsigned char*>(signature.data()), &signature_length) <= 0) {
             throw std::runtime_error("EVP_DigestSignFinal failed");
         }
 
@@ -126,7 +126,7 @@ namespace auth_manager::auth::key_provider {
         return signature;
     }
 
-    bool KeyProviderOpenSSLImpl::verify_impl(const std::string &message, const std::vector<unsigned char> &signature) {
+    bool KeyProviderOpenSSLImpl::verify_impl(const std::string &message, const std::vector<std::byte> &signature) {
         const std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free);
 
         if (!ctx) return false;
@@ -135,7 +135,7 @@ namespace auth_manager::auth::key_provider {
 
         if (EVP_DigestVerifyUpdate(ctx.get(), message.data(), message.size()) <= 0) { return false; }
 
-        const int result = EVP_DigestVerifyFinal(ctx.get(), signature.data(), signature.size());
+        const int result = EVP_DigestVerifyFinal(ctx.get(), reinterpret_cast<const unsigned char*>(signature.data()), signature.size());
 
         return result == 1;
     }

@@ -8,6 +8,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <cstddef>
 
 namespace auth_manager::auth::key_provider {
     class KeyProvider {
@@ -27,8 +28,8 @@ namespace auth_manager::auth::key_provider {
         virtual void save_keys_impl(const std::string& private_key_path, const std::string& public_key_path) = 0;
         virtual void load_keys_impl(const std::string& private_key_path, const std::string& public_key_path) = 0;
 
-        virtual std::vector<unsigned char> sign_impl(const std::string &message) = 0;
-        virtual bool verify_impl(const std::string &message, const std::vector<unsigned char> &signature) = 0;
+        virtual std::vector<std::byte> sign_impl(const std::string &message) = 0;
+        virtual bool verify_impl(const std::string &message, const std::vector<std::byte> &signature) = 0;
 
         [[nodiscard]] virtual bool is_key_loaded_impl() const = 0;
 
@@ -42,8 +43,8 @@ namespace auth_manager::auth::key_provider {
         void load_keys();
         void remove_keys();
 
-        std::vector<unsigned char> sign(const std::string &message);
-        bool verify(const std::string& message, const std::vector<unsigned char>& signature);
+        std::vector<std::byte> sign(const std::string &message);
+        bool verify(const std::string& message, const std::vector<std::byte>& signature);
 
         [[nodiscard]] bool is_key_loaded() const;
 

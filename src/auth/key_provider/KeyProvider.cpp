@@ -41,12 +41,12 @@ namespace auth_manager::auth::key_provider {
         remove_pem_files();
     }
 
-    std::vector<unsigned char> KeyProvider::sign(const std::string &message) {
+    std::vector<std::byte> KeyProvider::sign(const std::string &message) {
         if (!is_key_loaded()) { throw std::runtime_error("Key not loaded"); }
         return sign_impl(message);
     }
 
-    bool KeyProvider::verify(const std::string &message, const std::vector<unsigned char> &signature) {
+    bool KeyProvider::verify(const std::string &message, const std::vector<std::byte> &signature) {
         if (!is_key_loaded()) { throw std::runtime_error("Key not loaded"); }
         return verify_impl(message, signature);
     }
