@@ -19,6 +19,7 @@ namespace auth_manager::auth::key_provider {
 
         [[nodiscard]] std::array<std::string_view, 2> key_file_paths() const;
 
+        virtual void free_keys() = 0;
     public:
         explicit KeyProvider(const std::string& file_base, const std::string& key_name);
 
@@ -26,7 +27,6 @@ namespace auth_manager::auth::key_provider {
 
         virtual void load_keys() = 0;
         virtual void generate_new_keys() = 0;
-        virtual void free_keys() = 0;
         void delete_keys();
 
         virtual std::vector<unsigned char> sign(const std::string &message) = 0;
