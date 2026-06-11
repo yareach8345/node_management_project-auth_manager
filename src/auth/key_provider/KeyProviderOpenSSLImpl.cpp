@@ -19,48 +19,13 @@ namespace auth_manager::auth::key_provider {
         if (pem_files_exist()) { KeyProviderOpenSSLImpl::load_keys(); }
     }
 
-    void KeyProviderOpenSSLImpl::extract_keys(const EVP_PKEY *pkey) const {
-        if (FILE *private_file = fopen(_private_key_file_path.c_str(), "wb")) {
-            PEM_write_PrivateKey(private_file, pkey, nullptr, nullptr, 0, nullptr, nullptr);
-            fclose(private_file);
-        } else {
-            perror("fopen");
-        }
 
-        if (FILE *public_file = fopen(_public_key_file_path.c_str(), "wb")) {
-            PEM_write_PUBKEY(public_file, pkey);
-            fclose(public_file);
-        } else {
-            perror("fopen");
-        }
+    void KeyProviderOpenSSLImpl::free_keys_impl() {
+        _private_key.reset();
+        _public_key.reset();
     }
 
-    void KeyProviderOpenSSLImpl::load_keys() {
-        // read Private Key
-        FILE* private_key_fp = fopen(_private_key_file_path.c_str(), "r");
-        if (!private_key_fp) {
-            throw std::runtime_error("failed to open private key file");
-        }
-
-        const auto read_private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
-        _private_key.reset(read_private_key);
-        fclose(private_key_fp);
-
-        // read Public Key
-        FILE* public_key_fp = fopen(_public_key_file_path.c_str(), "r");
-        if (!public_key_fp) {
-            throw std::runtime_error("failed to open public key file");
-        }
-
-        const auto read_public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
-        _public_key.reset(read_public_key);
-        fclose(public_key_fp);
-    }
-
-    void KeyProviderOpenSSLImpl::generate_new_keys() {
-        free_keys();
-        delete_keys();
-
+    void KeyProviderOpenSSLImpl::generate_keys_impl() {
         const std::unique_ptr<EVP_PKEY_CTX, decltype(&EVP_PKEY_CTX_free)> ctx(EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr), EVP_PKEY_CTX_free);
 
         if (ctx == nullptr) {
@@ -74,32 +39,64 @@ namespace auth_manager::auth::key_provider {
             throw std::runtime_error("EVP_PKEY_CTX_set_rsa_keygen_bits failed");
         }
 
-        std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> pkey([&ctx] {
-            EVP_PKEY* pkey = nullptr;
+        EVP_PKEY* pkey = nullptr;
+        if (EVP_PKEY_keygen(ctx.get(), &pkey) <= 0) {
+            throw std::runtime_error("EVP_PKEY_keygen");
+        }
+        _private_key.reset(pkey);
 
-            if (EVP_PKEY_keygen(ctx.get(), &pkey) <= 0) {
-                throw std::runtime_error("EVP_PKEY_keygen");
-            }
+        const std::unique_ptr<BIO, decltype(&BIO_free)> bio(BIO_new(BIO_s_mem()), BIO_free);
 
-            return pkey;
-        }(), EVP_PKEY_free);
+        if (bio == nullptr) { throw std::runtime_error("BIO_new failed"); }
 
-        std::filesystem::create_directory(_file_base);
+        if (!PEM_write_bio_PUBKEY(bio.get(), pkey)) { throw std::runtime_error("PEM_write_bio_PUBKEY failed"); }
 
-        extract_keys(pkey.get());
-
-        load_keys();
+        _public_key.reset(PEM_read_bio_PUBKEY(bio.get(), nullptr, nullptr, nullptr));
+        if (_public_key == nullptr) {
+            remove_keys();
+            throw std::runtime_error("PEM_read_bio_PUBKEY failed");
+        }
     }
 
-    void KeyProviderOpenSSLImpl::free_keys() {
-        _private_key.reset();
-        _public_key.reset();
+    void KeyProviderOpenSSLImpl::save_keys_impl(const std::string& private_key_path, const std::string& public_key_path) {
+        if (FILE *private_file = fopen(private_key_path.c_str(), "wb")) {
+            PEM_write_PrivateKey(private_file, _private_key.get(), nullptr, nullptr, 0, nullptr, nullptr);
+            fclose(private_file);
+        } else {
+            perror("fopen");
+        }
+        if (FILE *public_file = fopen(public_key_path.c_str(), "wb")) {
+            PEM_write_PUBKEY(public_file, _public_key.get());
+            fclose(public_file);
+        } else {
+            perror("fopen");
+        }
     }
 
-    std::vector<unsigned char> KeyProviderOpenSSLImpl::sign(const std::string &message) {
-        if (!is_key_loaded()) { throw std::runtime_error("Key is not loaded"); }
+    void KeyProviderOpenSSLImpl::load_keys_impl(const std::string& private_key_path, const std::string& public_key_path) {
+        // read Private Key
+        FILE* private_key_fp = fopen(private_key_path.c_str(), "r");
+        if (!private_key_fp) {
+            throw std::runtime_error("failed to open private key file");
+        }
 
-        std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free);
+        const auto read_private_key = PEM_read_PrivateKey(private_key_fp, nullptr, nullptr, nullptr);
+        _private_key.reset(read_private_key);
+        fclose(private_key_fp);
+
+        // read Public Key
+        FILE* public_key_fp = fopen(public_key_path.c_str(), "r");
+        if (!public_key_fp) {
+            throw std::runtime_error("failed to open public key file");
+        }
+
+        const auto read_public_key = PEM_read_PUBKEY(public_key_fp, nullptr, nullptr, nullptr);
+        _public_key.reset(read_public_key);
+        fclose(public_key_fp);
+    }
+
+    std::vector<unsigned char> KeyProviderOpenSSLImpl::sign_impl(const std::string &message) {
+        const std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free);
 
         if (!ctx)
             throw std::runtime_error("EVP_MD_CTX_new failed");
@@ -129,9 +126,7 @@ namespace auth_manager::auth::key_provider {
         return signature;
     }
 
-    bool KeyProviderOpenSSLImpl::verify(const std::string &message, const std::vector<unsigned char> &signature) {
-        if (!is_key_loaded()) { throw std::runtime_error("Key is not loaded"); }
-
+    bool KeyProviderOpenSSLImpl::verify_impl(const std::string &message, const std::vector<unsigned char> &signature) {
         const std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free);
 
         if (!ctx) return false;
@@ -145,13 +140,11 @@ namespace auth_manager::auth::key_provider {
         return result == 1;
     }
 
-    bool KeyProviderOpenSSLImpl::is_key_loaded() const {
+    bool KeyProviderOpenSSLImpl::is_key_loaded_impl() const {
         return _private_key && _public_key;
     }
 
-    std::string KeyProviderOpenSSLImpl::export_public_key() const {
-        if (!is_key_loaded()) { throw std::runtime_error("Key is not loaded"); }
-
+    std::string KeyProviderOpenSSLImpl::export_public_key_impl() const {
         const std::unique_ptr<BIO, decltype(&BIO_free)> bio(BIO_new(BIO_s_mem()), BIO_free);
 
         PEM_write_bio_PUBKEY(bio.get(), _public_key.get());

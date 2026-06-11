@@ -11,6 +11,8 @@
 
 namespace auth_manager::auth::key_provider {
     class KeyProvider {
+    private:
+        void remove_pem_files() const;
     protected:
         const std::string _key_name;
         const std::string _file_base;
@@ -19,20 +21,31 @@ namespace auth_manager::auth::key_provider {
 
         [[nodiscard]] std::array<std::string_view, 2> key_file_paths() const;
 
-        virtual void free_keys() = 0;
+        virtual void free_keys_impl() = 0;
+
+        virtual void generate_keys_impl() = 0;
+        virtual void save_keys_impl(const std::string& private_key_path, const std::string& public_key_path) = 0;
+        virtual void load_keys_impl(const std::string& private_key_path, const std::string& public_key_path) = 0;
+
+        virtual std::vector<unsigned char> sign_impl(const std::string &message) = 0;
+        virtual bool verify_impl(const std::string &message, const std::vector<unsigned char> &signature) = 0;
+
+        [[nodiscard]] virtual bool is_key_loaded_impl() const = 0;
+
+        [[nodiscard]] virtual std::string export_public_key_impl() const = 0;
     public:
         explicit KeyProvider(const std::string& file_base, const std::string& key_name);
 
         virtual ~KeyProvider();
 
-        virtual void load_keys() = 0;
-        virtual void generate_new_keys() = 0;
-        void delete_keys();
+        void generate_new_keys();
+        void load_keys();
+        void remove_keys();
 
-        virtual std::vector<unsigned char> sign(const std::string &message) = 0;
-        virtual bool verify(const std::string& message, const std::vector<unsigned char>& signature) = 0;
+        std::vector<unsigned char> sign(const std::string &message);
+        bool verify(const std::string& message, const std::vector<unsigned char>& signature);
 
-        [[nodiscard]] virtual bool is_key_loaded() const = 0;
+        [[nodiscard]] bool is_key_loaded() const;
 
         [[nodiscard]] bool pem_files_exist() const;
 
@@ -42,7 +55,7 @@ namespace auth_manager::auth::key_provider {
         [[nodiscard]] std::string_view private_key_file_path() const;
         [[nodiscard]] std::string_view public_key_file_path() const;
 
-        [[nodiscard]] virtual std::string export_public_key() const = 0;
+        [[nodiscard]] std::string export_public_key() const;
     };
 }
 

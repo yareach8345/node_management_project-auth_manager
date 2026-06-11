@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     std::cout << (provider.verify("hello world!", signed_h) ? "true" : "false") << std::endl;
     std::cout << (provider.verify("hello world", signed_h) ? "true" : "false") << std::endl;
 
-    provider.delete_keys();
+    provider.remove_keys();
     std::cout << "third: " << (provider.is_key_loaded() ? "true" : "false") << std::endl;
 
     return 0;
