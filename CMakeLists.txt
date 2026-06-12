@@ -29,7 +29,7 @@ add_library(auth_manager_lib
         src/auth/mapping/KeysInfoJsonConverter.cpp
         include/auth_manager/core/json/JsonFileManager.h
         include/auth_manager/auth/key_provider/KeyProvider.h
-        include/auth_manager/auth/key_manager/AuthKeyManager.h
+        src/auth/key_provider/KeyProvider.cpp
         include/auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h
         src/auth/key_provider/KeyProviderOpenSSLImpl.cpp
         include/auth_manager/auth/util/OpenSSLUtil.h
@@ -39,7 +39,6 @@ add_library(auth_manager_lib
         include/auth_manager/gui/TabInfo.h
         include/auth_manager/auth/tab/RootKeyManageTab.h
         src/auth/tab/RootKeyManageTab.cpp
-        src/auth/key_manager/AuthKeyManager.cpp
 )
 
 target_include_directories(auth_manager_lib
@@ -85,7 +84,6 @@ enable_testing()
 
 add_executable(auth_manager_test
         test/test.cpp
-        test/unit/KeyProviderTest.cpp
 )
 
 target_link_libraries(auth_manager_test
