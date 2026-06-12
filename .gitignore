@@ -2,4 +2,5 @@
 cmake-build-debug
 
 config.yaml
+config.*.yaml
 auth_keys
