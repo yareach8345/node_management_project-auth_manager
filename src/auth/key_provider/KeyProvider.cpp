@@ -3,8 +3,10 @@
 //
 
 #include "auth_manager/auth/key_provider/KeyProvider.h"
-#include <filesystem>
 #include <algorithm>
+#include "auth_manager/util/FileUtil.h"
+
+using auth_manager::util::FileUtil;
 
 namespace auth_manager::auth::key_provider {
     KeyProvider::KeyProvider(const std::string& file_base, const std::string& key_name):
@@ -17,15 +19,13 @@ namespace auth_manager::auth::key_provider {
     KeyProvider::~KeyProvider() = default;
 
     void KeyProvider::remove_pem_files() const {
-        if (std::filesystem::exists(_file_base)) {
-            std::filesystem::remove_all(_file_base);
-        }
+        FileUtil::remove_all_if_exists(_file_base);
     }
 
     void KeyProvider::generate_new_keys() {
         remove_keys();
         generate_keys_impl();
-        std::filesystem::create_directory(_file_base);
+        FileUtil::create_directory(_file_base);
         save_keys_impl(_private_key_file_path, _public_key_file_path);
     }
 
@@ -54,7 +54,7 @@ namespace auth_manager::auth::key_provider {
     bool KeyProvider::pem_files_exist() const {
         return std::ranges::all_of(
             key_file_paths(),
-            [](const std::string_view file_path) { return std::filesystem::exists(file_path); }
+            [](const std::filesystem::path& file_path) { return FileUtil::is_exists(file_path); }
         );
     }
 
@@ -67,13 +67,13 @@ namespace auth_manager::auth::key_provider {
         return export_public_key_impl();
     }
 
-    std::array<std::string_view, 2> KeyProvider::key_file_paths() const { return { _public_key_file_path, _private_key_file_path }; }
-
-    std::string_view KeyProvider::file_base() const { return _file_base; }
+    std::array<const std::filesystem::path, 2> KeyProvider::key_file_paths() const { return { _public_key_file_path, _private_key_file_path }; }
 
     std::string_view KeyProvider::key_name() const { return _key_name; }
 
-    std::string_view KeyProvider::public_key_file_path() const { return _public_key_file_path; }
+    std::filesystem::path KeyProvider::file_base() const { return _file_base; }
 
-    std::string_view KeyProvider::private_key_file_path() const { return _private_key_file_path; }
+    std::filesystem::path KeyProvider::public_key_file_path() const { return _public_key_file_path; }
+
+    std::filesystem::path KeyProvider::private_key_file_path() const { return _private_key_file_path; }
 }

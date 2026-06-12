@@ -9,6 +9,7 @@
 #include <array>
 #include <vector>
 #include <cstddef>
+#include <filesystem>
 
 namespace auth_manager::auth::key_provider {
     class KeyProvider {
@@ -16,11 +17,11 @@ namespace auth_manager::auth::key_provider {
         void remove_pem_files() const;
     protected:
         const std::string _key_name;
-        const std::string _file_base;
-        const std::string _private_key_file_path;
-        const std::string _public_key_file_path;
+        const std::filesystem::path _file_base;
+        const std::filesystem::path _private_key_file_path;
+        const std::filesystem::path _public_key_file_path;
 
-        [[nodiscard]] std::array<std::string_view, 2> key_file_paths() const;
+        [[nodiscard]] std::array<const std::filesystem::path, 2> key_file_paths() const;
 
         virtual void free_keys_impl() = 0;
 
@@ -50,11 +51,11 @@ namespace auth_manager::auth::key_provider {
 
         [[nodiscard]] bool pem_files_exist() const;
 
-        [[nodiscard]] std::string_view file_base() const;
         [[nodiscard]] std::string_view key_name() const;
 
-        [[nodiscard]] std::string_view private_key_file_path() const;
-        [[nodiscard]] std::string_view public_key_file_path() const;
+        [[nodiscard]] std::filesystem::path file_base() const;
+        [[nodiscard]] std::filesystem::path private_key_file_path() const;
+        [[nodiscard]] std::filesystem::path public_key_file_path() const;
 
         [[nodiscard]] std::string export_public_key() const;
     };
