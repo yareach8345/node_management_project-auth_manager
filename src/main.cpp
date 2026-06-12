@@ -3,6 +3,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "auth_manager/auth/config/AuthConfig.h"
+#include "../include/auth_manager/auth/key_manager/AuthKeyManager.h"
 #include "auth_manager/auth/key_provider/KeyProvider.h"
 #include "auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h"
 #include "auth_manager/auth/service/IKeyService.h"
@@ -14,24 +15,25 @@ int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
     const auth_manager::auth::AuthConfig auth_config(config);
 
-    auto provider = auth_manager::auth::key_provider::KeyProviderOpenSSLImpl(auth_config.file_base(), "root");
+    auto provider = std::make_shared<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>();
+    auto key_manager = auth_manager::auth::AuthKeyManager(provider, auth_config.file_base(), "test");
 
-    std::cout << provider.file_base() << std::endl;
-    std::cout << provider.key_name() << std::endl;
-    std::cout << provider.private_key_file_path() << std::endl;
-    std::cout << provider.public_key_file_path() << std::endl;
+    std::cout << key_manager.file_base() << std::endl;
+    std::cout << key_manager.key_name() << std::endl;
+    std::cout << key_manager.private_key_file_path() << std::endl;
+    std::cout << key_manager.public_key_file_path() << std::endl;
 
-    std::cout << "first : " << (provider.is_key_loaded() ? "true" : "false") << std::endl;
-    provider.generate_new_keys();
-    std::cout << "second: " << (provider.is_key_loaded() ? "true" : "false") << std::endl;
+    std::cout << "first : " << (key_manager.is_key_loaded() ? "true" : "false") << std::endl;
+    key_manager.generate_new_keys();
+    std::cout << "second: " << (key_manager.is_key_loaded() ? "true" : "false") << std::endl;
 
-    const auto signed_h = provider.sign("hello world!");
+    const auto signed_h = key_manager.sign("hello world!");
 
-    std::cout << (provider.verify("hello world!", signed_h) ? "true" : "false") << std::endl;
-    std::cout << (provider.verify("hello world", signed_h) ? "true" : "false") << std::endl;
+    std::cout << (key_manager.verify("hello world!", signed_h) ? "true" : "false") << std::endl;
+    std::cout << (key_manager.verify("hello world", signed_h) ? "true" : "false") << std::endl;
 
-    provider.remove_keys();
-    std::cout << "third: " << (provider.is_key_loaded() ? "true" : "false") << std::endl;
+    key_manager.remove_keys();
+    std::cout << "third: " << (key_manager.is_key_loaded() ? "true" : "false") << std::endl;
 
     return 0;
     //
