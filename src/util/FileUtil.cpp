@@ -36,6 +36,6 @@ namespace auth_manager::util {
     }
 
     void FileUtil::create_directory(const std::filesystem::path &directory_path) {
-        std::filesystem::create_directory(directory_path);
+        std::filesystem::create_directories(directory_path);
     }
 }
