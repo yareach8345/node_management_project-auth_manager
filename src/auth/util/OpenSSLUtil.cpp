@@ -48,20 +48,36 @@ namespace auth_manager::auth::util {
         return make_evp_pkey(PEM_read_bio_PUBKEY(bio.get(), nullptr, nullptr, nullptr));
     }
 
-    void OpenSSLUtil::save_evp_pkey(const EVP_PKEY *pkey, const std::string &file_path) {
-        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(file_path.c_str(), "wb"), fclose);
+    void OpenSSLUtil::save_evp_private_key(const EVP_PKEY *private_key, const std::string &private_key_path) {
+        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(private_key_path.c_str(), "wb"), fclose);
         if (file == nullptr) {
             throw std::runtime_error("fopen failed");
         }
-        PEM_write_PrivateKey(file.get(), pkey, nullptr, nullptr, 0, nullptr, nullptr);
+        PEM_write_PrivateKey(file.get(), private_key, nullptr, nullptr, 0, nullptr, nullptr);
     }
 
-    EvpPkeyT OpenSSLUtil::read_evp_pkey(const std::string &file_path) {
-        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(file_path.c_str(), "r"), fclose);
+    void OpenSSLUtil::save_evp_public_key(const EVP_PKEY *public_key, const std::string &public_key_path) {
+        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(public_key_path.c_str(), "wb"), fclose);
+        if (file == nullptr) {
+            throw std::runtime_error("fopen failed");
+        }
+        PEM_write_PUBKEY(file.get(), public_key);
+    }
+
+    EvpPkeyT OpenSSLUtil::read_evp_private_key(const std::string &private_key_path) {
+        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(private_key_path.c_str(), "r"), fclose);
 
         if (file == nullptr) { throw std::runtime_error("failed to open private key file"); }
 
         return make_evp_pkey(PEM_read_PrivateKey(file.get(), nullptr, nullptr, nullptr));
+    }
+
+    EvpPkeyT OpenSSLUtil::read_evp_public_key(const std::string &public_key_path) {
+        const std::unique_ptr<FILE, decltype(&fclose)> file(fopen(public_key_path.c_str(), "r"), fclose);
+
+        if (file == nullptr) { throw std::runtime_error("failed to open public key file"); }
+
+        return make_evp_pkey(PEM_read_PUBKEY(file.get(), nullptr, nullptr, nullptr));
     }
 
     std::vector<std::byte> OpenSSLUtil::sign(const std::string &message, EVP_PKEY *private_key) {

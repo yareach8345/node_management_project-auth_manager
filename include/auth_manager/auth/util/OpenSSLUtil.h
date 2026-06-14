@@ -20,9 +20,13 @@ namespace auth_manager::auth::util {
 
         [[nodiscard]] static EvpPkeyT extract_public_key(const EVP_PKEY* private_key);
 
-        static void save_evp_pkey(const EVP_PKEY* pkey, const std::string& file_path);
+        static void save_evp_private_key(const EVP_PKEY* private_key, const std::string& private_key_path);
 
-        static EvpPkeyT read_evp_pkey(const std::string& file_path);
+        static void save_evp_public_key(const EVP_PKEY *public_key, const std::string &public_key_path);
+
+        static EvpPkeyT read_evp_private_key(const std::string& private_key_path);
+
+        static EvpPkeyT read_evp_public_key(const std::string& public_key_path);
 
         [[nodiscard]] static std::vector<std::byte> sign(const std::string &message, EVP_PKEY *private_key);
 

@@ -26,13 +26,13 @@ namespace auth_manager::auth::key_provider {
     }
 
     void KeyProviderOpenSSLImpl::save_keys_impl(const std::string& private_key_path, const std::string& public_key_path) {
-        OpenSSLUtil::save_evp_pkey(_private_key.get(), private_key_path);
-        OpenSSLUtil::save_evp_pkey(_public_key.get(), public_key_path);
+        OpenSSLUtil::save_evp_private_key(_private_key.get(), private_key_path);
+        OpenSSLUtil::save_evp_public_key(_public_key.get(), public_key_path);
     }
 
     void KeyProviderOpenSSLImpl::load_keys_impl(const std::string& private_key_path, const std::string& public_key_path) {
-        _private_key = OpenSSLUtil::read_evp_pkey(private_key_path);
-        _public_key = OpenSSLUtil::read_evp_pkey(public_key_path);
+        _private_key = OpenSSLUtil::read_evp_private_key(private_key_path);
+        _public_key = OpenSSLUtil::read_evp_public_key(public_key_path);
     }
 
     std::vector<std::byte> KeyProviderOpenSSLImpl::sign_impl(const std::string &message) {
