@@ -22,8 +22,8 @@ add_library(auth_manager_lib
         include/auth_manager/auth/config/AuthConfig.h
         src/auth/config/AuthConfig.cpp
         include/auth_manager/auth/service/IKeyService.h
-        include/auth_manager/auth/service/KeyServiceOpenSSLImpl.h
-        src/auth/service/KeyServiceOpenSSLImpl.cpp
+        include/auth_manager/auth/service/KeyServiceImpl.h
+        src/auth/service/KeyServiceImpl.cpp
         include/auth_manager/core/json/IJsonConverter.h
         include/auth_manager/auth/mapping/KeysInfoJsonConverter.h
         src/auth/mapping/KeysInfoJsonConverter.cpp
@@ -86,6 +86,7 @@ enable_testing()
 
 add_executable(auth_manager_test
         test/test.cpp
+        test/unit/auth/KeyProviderOpenSSLImplTest.cpp
 )
 
 target_link_libraries(auth_manager_test
@@ -93,6 +94,9 @@ target_link_libraries(auth_manager_test
         auth_manager_lib
         GTest::gtest GTest::gtest_main
 )
+
+# test용 config 파일 위치
+target_compile_definitions(auth_manager_test PRIVATE TEST_CONFIG_FILE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/config.test.yaml")
 
 include(GoogleTest)
 gtest_discover_tests(auth_manager_test)
