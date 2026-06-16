@@ -24,7 +24,7 @@ add_library(auth_manager_lib
         include/auth_manager/auth/service/IKeyService.h
         include/auth_manager/auth/service/KeyServiceImpl.h
         src/auth/service/KeyServiceImpl.cpp
-        include/auth_manager/core/json/IJsonConverter.h
+        include/auth_manager/core/json/JsonConverter.h
         include/auth_manager/auth/mapping/KeysInfoJsonConverter.h
         src/auth/mapping/KeysInfoJsonConverter.cpp
         include/auth_manager/core/json/JsonFileManager.h

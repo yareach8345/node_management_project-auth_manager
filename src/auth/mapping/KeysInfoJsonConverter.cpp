@@ -8,23 +8,20 @@
 namespace auth_manager::auth {
     std::shared_ptr<KeysInfoJsonConverter> KeysInfoJsonConverter::_instance = nullptr;
 
-    std::shared_ptr<core::json::IJsonConverter<KeysInfo>> KeysInfoJsonConverter::get_instance() {
+    std::shared_ptr<core::json::JsonConverter<KeysInfo>> KeysInfoJsonConverter::get_instance() {
         if (!_instance) { _instance = std::make_shared<KeysInfoJsonConverter>(); }
         return _instance;
     }
 
-    std::string KeysInfoJsonConverter::serialize(const KeysInfo &data, const int indent) const {
-        const nlohmann::json json = {{ "created_at", data.created_at }};
-        if (indent == 0) {
-            return json.dump();
-        } else {
-            return json.dump(indent);
-        }
+    nlohmann::json KeysInfoJsonConverter::to_json(const KeysInfo &data) const {
+        return {
+            { "created_at" , data.created_at }
+        };
     }
 
-    KeysInfo KeysInfoJsonConverter::deserialize(std::string_view json_string) const {
-        const nlohmann::json json = nlohmann::json::parse(json_string);
-        const std::string created_at = json["created_at"];
-        return { .created_at = created_at };
+    KeysInfo KeysInfoJsonConverter::from_json(const nlohmann::json &json) const {
+        return {
+            .created_at = json["created_at"].get<std::string>(),
+        };
     }
 }

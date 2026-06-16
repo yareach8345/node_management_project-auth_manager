@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include "IJsonConverter.h"
+#include "JsonConverter.h"
 
 namespace auth_manager::core::json {
     template<typename T>
@@ -17,9 +17,9 @@ namespace auth_manager::core::json {
     private:
         std::string file_path;
 
-        std::shared_ptr<IJsonConverter<T>> jsonConverter;
+        std::shared_ptr<JsonConverter<T>> jsonConverter;
     public:
-        explicit JsonFileManager(std::string file_path, std::shared_ptr<IJsonConverter<T>> jsonConverter);
+        explicit JsonFileManager(std::string file_path, std::shared_ptr<JsonConverter<T>> jsonConverter);
 
         [[nodiscard]] bool exists() const;
 
@@ -31,7 +31,7 @@ namespace auth_manager::core::json {
     };
 
     template<typename T>
-    JsonFileManager<T>::JsonFileManager(std::string file_path, std::shared_ptr<IJsonConverter<T>> jsonConverter): file_path(std::move(file_path)), jsonConverter(jsonConverter) {}
+    JsonFileManager<T>::JsonFileManager(std::string file_path, std::shared_ptr<JsonConverter<T>> jsonConverter): file_path(std::move(file_path)), jsonConverter(jsonConverter) {}
 
     template<typename T>
     bool JsonFileManager<T>::exists() const {
