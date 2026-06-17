@@ -87,6 +87,7 @@ enable_testing()
 add_executable(auth_manager_test
         test/test.cpp
         test/unit/auth/KeyProviderOpenSSLImplTest.cpp
+        test/unit/auth/KeysInfoJsonConverterTest.cpp
 )
 
 target_link_libraries(auth_manager_test

@@ -6,7 +6,6 @@
 #define AUTH_MANAGER_KEY_SERVICE_IMPL_H
 
 #include "IKeyService.h"
-#include <openssl/evp.h>
 
 #include "auth_manager/auth/config/AuthConfig.h"
 #include "auth_manager/auth/key_provider/KeyProvider.h"

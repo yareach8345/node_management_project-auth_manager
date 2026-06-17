@@ -16,7 +16,7 @@ using auth_manager::auth::util::OpenSSLUtil;
 
 class KeyProviderOpenSSLImplTest : public ::testing::Test {
 private:
-    void clear_file() {
+    void clear_file() const {
         FileUtil::remove_all_if_exists(test_file_base);
     }
 protected:
