@@ -14,6 +14,9 @@ namespace auth_manager::auth::util {
 
     class OpenSSLUtil {
     public:
+        static std::string ALGORITHM;
+        static int KEY_BITS;
+
         [[nodiscard]] static EvpPkeyT make_evp_pkey(EVP_PKEY* init);
 
         [[nodiscard]] static EvpPkeyT generate_evp_pkey();

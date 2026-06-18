@@ -15,13 +15,17 @@ namespace auth_manager::auth {
 
     nlohmann::json KeysInfoJsonConverter::to_json(const KeysInfo &data) const {
         return {
-            { "created_at" , data.created_at }
+            { "created_at" , data.created_at },
+            { "algorithm" , data.algorithm },
+            { "bits", data.bits }
         };
     }
 
     KeysInfo KeysInfoJsonConverter::from_json(const nlohmann::json &json) const {
         return {
             .created_at = json["created_at"].get<std::string>(),
+            .algorithm = json["algorithm"].get<std::string>(),
+            .bits = json["bits"].get<int>()
         };
     }
 }

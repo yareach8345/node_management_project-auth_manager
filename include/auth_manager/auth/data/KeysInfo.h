@@ -10,6 +10,8 @@
 namespace auth_manager::auth {
     struct KeysInfo {
         std::string created_at;
+        std::string algorithm;
+        int bits;
     };
 }
 

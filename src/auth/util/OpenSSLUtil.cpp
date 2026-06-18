@@ -8,6 +8,9 @@
 #include <openssl/pem.h>
 
 namespace auth_manager::auth::util {
+    std::string OpenSSLUtil::ALGORITHM = "rsa";
+    int OpenSSLUtil::KEY_BITS = 2048;
+
     EvpPkeyT OpenSSLUtil::make_evp_pkey(EVP_PKEY *init) {
         return { init, EVP_PKEY_free };
     }
@@ -22,7 +25,7 @@ namespace auth_manager::auth::util {
         if (EVP_PKEY_keygen_init(ctx.get()) <= 0) {
             throw std::runtime_error("EVP_PKEY_keygen_init failed");
         }
-        if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx.get(), 2048) <= 0) {
+        if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx.get(), KEY_BITS) <= 0) {
             throw std::runtime_error("EVP_PKEY_CTX_set_rsa_keygen_bits failed");
         }
 

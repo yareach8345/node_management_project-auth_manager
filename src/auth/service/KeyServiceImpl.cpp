@@ -12,6 +12,7 @@
 
 #include "auth_manager/auth/config/AuthConfig.h"
 #include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
+#include "auth_manager/auth/util/OpenSSLUtil.h"
 
 namespace auth_manager::auth {
     KeyServiceImpl::KeyServiceImpl(
@@ -40,7 +41,7 @@ namespace auth_manager::auth {
 
         const auto now = std::chrono::system_clock::now();
         const std::string created_at = std::format("{:%Y-%m-%d %H:%M:%S}", now);
-        _json_file_manager.write_to_file(KeysInfo(created_at));
+        _json_file_manager.write_to_file(KeysInfo(created_at, util::OpenSSLUtil::ALGORITHM, util::OpenSSLUtil::KEY_BITS));
 
         load_keys();
     }
