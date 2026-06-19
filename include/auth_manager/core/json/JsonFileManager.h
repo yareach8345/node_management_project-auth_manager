@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include "JsonConverter.h"
+#include "auth_manager/util/FileUtil.h"
 
 namespace auth_manager::core::json {
     template<typename T>
@@ -45,10 +46,12 @@ namespace auth_manager::core::json {
             std::cerr << "JsonUtil::load_json_file failed: " << file_path << std::endl;
             throw std::runtime_error("JsonUtil::load_json_file failed");
         }
+
         std::stringstream ss;
         ss << file.rdbuf();
         T result = jsonConverter->deserialize(ss.str());
         file.close();
+
         return result;
     }
 
@@ -70,7 +73,8 @@ namespace auth_manager::core::json {
             std::cerr << "file is not exists" << file_path << std::endl;
             throw std::runtime_error("File is not exists");
         }
-        std::filesystem::remove(file_path);
+
+        util::FileUtil::remove(file_path);
     }
 }
 
