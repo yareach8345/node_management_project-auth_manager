@@ -6,7 +6,6 @@
 
 #include <chrono>
 #include <format>
-#include <iostream>
 #include <filesystem>
 #include <utility>
 
@@ -24,12 +23,7 @@ namespace auth_manager::auth {
         _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/keys_info.json"),
         _json_file_manager(auth_config.file_base() + "/" + key_name + "/keys_info.json", KeysInfoJsonConverter::get_instance())
     {
-        const bool is_all_required_files_exist = std::ranges::all_of(
-            required_files(),
-            [](const std::string_view file_path) { return std::filesystem::exists(file_path); }
-        );
-
-        if (is_all_required_files_exist) {
+        if (_key_provider->is_key_loaded() && _json_file_manager.exists()) {
             KeyServiceImpl::load_keys();
         }
     };
@@ -46,14 +40,12 @@ namespace auth_manager::auth {
         load_keys();
     }
 
-    std::array<std::string_view, 3> KeyServiceImpl::required_files() const {
-        return { _key_provider->private_key_file_path().string(), _key_provider->public_key_file_path().string(), _keys_info_file_path };
+    std::array<std::filesystem::path, 3> KeyServiceImpl::required_files() const {
+        return { _key_provider->private_key_file_path(), _key_provider->public_key_file_path(), _keys_info_file_path };
     }
 
     void KeyServiceImpl::load_keys() {
         _key_provider->load_keys();
-
-        //read keys info
         _keys_info = _json_file_manager.read_from_file();
     }
 
@@ -63,11 +55,8 @@ namespace auth_manager::auth {
     }
 
     void KeyServiceImpl::delete_keys() {
-        for (std::string_view required_file : required_files()) {
-            if (std::filesystem::exists(required_file)) {
-                std::filesystem::remove(required_file);
-            }
-        }
+        _key_provider->remove_keys();
+        _json_file_manager.delete_file();
     }
 
     std::vector<std::byte> KeyServiceImpl::sign(const std::string &message) {
@@ -82,13 +71,13 @@ namespace auth_manager::auth {
 
     std::string_view KeyServiceImpl::key_name() const { return _key_provider->key_name(); }
 
-    std::string_view KeyServiceImpl::private_key_file_path() const { return _key_provider->private_key_file_path().c_str(); }
+    std::filesystem::path KeyServiceImpl::private_key_file_path() const { return _key_provider->private_key_file_path(); }
 
-    std::string_view KeyServiceImpl::public_key_file_path() const { return _key_provider->public_key_file_path().c_str(); }
+    std::filesystem::path KeyServiceImpl::public_key_file_path() const { return _key_provider->public_key_file_path(); }
 
     std::string KeyServiceImpl::export_public_key() const { return _key_provider->export_public_key(); }
 
-    std::string_view KeyServiceImpl::keys_info_file_path() const { return _keys_info_file_path; }
+    std::filesystem::path KeyServiceImpl::keys_info_file_path() const { return _keys_info_file_path; }
 
     std::optional<KeysInfo> KeyServiceImpl::keys_info() const { return _keys_info; }
 }
