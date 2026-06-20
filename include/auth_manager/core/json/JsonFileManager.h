@@ -69,12 +69,7 @@ namespace auth_manager::core::json {
 
     template<typename T>
     void JsonFileManager<T>::delete_file() const {
-        if (!exists()) {
-            std::cerr << "file is not exists" << file_path << std::endl;
-            throw std::runtime_error("File is not exists");
-        }
-
-        util::FileUtil::remove(file_path);
+        util::FileUtil::remove_if_exists(file_path);
     }
 }
 

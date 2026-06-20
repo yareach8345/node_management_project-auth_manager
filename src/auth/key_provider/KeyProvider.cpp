@@ -19,7 +19,8 @@ namespace auth_manager::auth::key_provider {
     KeyProvider::~KeyProvider() = default;
 
     void KeyProvider::remove_pem_files() const {
-        FileUtil::remove_all_if_exists(_file_base);
+        FileUtil::remove_if_exists(_private_key_file_path);
+        FileUtil::remove_if_exists(_public_key_file_path);
     }
 
     void KeyProvider::generate_new_keys() {
