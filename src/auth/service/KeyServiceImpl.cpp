@@ -57,6 +57,7 @@ namespace auth_manager::auth {
     void KeyServiceImpl::delete_keys() {
         _key_provider->remove_keys();
         _json_file_manager.delete_file();
+        _keys_info.reset();
     }
 
     std::vector<std::byte> KeyServiceImpl::sign(const std::string &message) {
