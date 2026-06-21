@@ -11,15 +11,40 @@ namespace auth_manager::auth::gui {
         _root_key_service(root_key_service)
     {
         init_layout();
+        connect_event();
+        update_key_info_viewer();
     }
 
     void RootKeyManageTab::init_layout() {
-        _main_layout->addWidget(_test_label);
-        _test_label->setText(_root_key_service.get()->export_public_key().c_str());
+        _buttons_layout->addWidget(_generate_key_button);
+        _buttons_layout->addWidget(_delete_key_button);
+        _main_layout->addLayout(_buttons_layout);
 
         _main_layout->addWidget(_key_info_viewer);
-        _key_info_viewer->setText(KeysInfoJsonConverter::get_instance()->serialize(_root_key_service.get()->keys_info().value(), 4).c_str());
 
         setLayout(_main_layout);
+    }
+
+    void RootKeyManageTab::connect_event() {
+        connect(_generate_key_button, &QPushButton::clicked, this, &RootKeyManageTab::on_generate_key_button_clicked);
+        connect(_delete_key_button, &QPushButton::clicked, this, &RootKeyManageTab::on_delete_key_button_clicked);
+    }
+
+    void RootKeyManageTab::on_generate_key_button_clicked() {
+        _root_key_service->generate_new_keys();
+        update_key_info_viewer();
+    }
+
+    void RootKeyManageTab::on_delete_key_button_clicked() {
+        _root_key_service->delete_keys();
+        update_key_info_viewer();
+    }
+
+    void RootKeyManageTab::update_key_info_viewer() {
+        const std::string keys_info_string = _root_key_service->keys_info()
+            .transform([](const KeysInfo& info) {
+                return KeysInfoJsonConverter::get_instance()->serialize(info, 4);
+            }).value_or("Key is not loaded");
+        _key_info_viewer->setText(keys_info_string.c_str());
     }
 }

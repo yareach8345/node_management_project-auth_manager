@@ -19,14 +19,7 @@ int main(int argc, char *argv[]) {
 
     auto provider = std::make_shared<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>(auth_config.file_base(), "root");
 
-    std::shared_ptr<auth_manager::auth::IKeyService> ssl = std::make_shared<auth_manager::auth::KeyServiceImpl>(provider, auth_config, "root");
-    ssl->generate_new_keys();
-    std::cout << ssl->key_name() << std::endl;
-    std::cout << ssl->export_public_key() << std::endl;
-    const auto signed_h = ssl->sign("hello world!");
-
-    std::cout << (ssl->verify("hello world!", signed_h) ? "true" : "false") << std::endl;
-    std::cout << (ssl->verify("hello world", signed_h) ? "true" : "false") << std::endl;
+    const std::shared_ptr<auth_manager::auth::IKeyService> ssl = std::make_shared<auth_manager::auth::KeyServiceImpl>(provider, auth_config, "root");
 
     QApplication a(argc, argv);
 
