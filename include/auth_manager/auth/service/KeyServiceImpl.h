@@ -15,19 +15,17 @@
 namespace auth_manager::auth {
     class KeyServiceImpl : public IKeyService {
     private:
-        std::shared_ptr<key_provider::KeyProvider> _key_provider;
+        std::unique_ptr<key_provider::KeyProvider> _key_provider;
 
         core::json::JsonFileManager<KeysInfo> _json_file_manager;
 
-        std::filesystem::path _keys_info_file_path;
         std::optional<KeysInfo> _keys_info;
 
         [[nodiscard]] std::array<std::filesystem::path, 3> required_files() const;
     public:
         explicit KeyServiceImpl(
-            std::shared_ptr<key_provider::KeyProvider> key_provider,
-            const AuthConfig &auth_config,
-            const std::string& key_name
+            std::unique_ptr<key_provider::KeyProvider> key_provider,
+            core::json::JsonFileManager<KeysInfo> _json_file_manager
         );
 
         ~KeyServiceImpl() override;
@@ -47,7 +45,7 @@ namespace auth_manager::auth {
 
         [[nodiscard]] std::filesystem::path private_key_file_path() const override;
         [[nodiscard]] std::filesystem::path public_key_file_path() const override;
-        [[nodiscard]] std::string export_public_key() const override;
+        [[nodiscard]] std::optional<std::string> export_public_key() const override;
 
         [[nodiscard]] std::filesystem::path keys_info_file_path() const override;
         [[nodiscard]] std::optional<KeysInfo> keys_info() const override;

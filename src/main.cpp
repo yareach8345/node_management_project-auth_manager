@@ -12,14 +12,13 @@
 #include "auth_manager/gui/TabInfo.h"
 
 int main(int argc, char *argv[]) {
-    // 테스트용 임시 코드
-
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
     const auth_manager::auth::AuthConfig auth_config(config);
 
-    auto provider = std::make_shared<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>(auth_config.file_base(), "root");
+    std::unique_ptr<auth_manager::auth::key_provider::KeyProvider> provider = std::make_unique<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>(auth_config.file_base(), "root");
+    auto json_file_manager = auth_manager::core::json::JsonFileManager(auth_config.file_base() + "/root/keys_info.json", auth_manager::auth::KeysInfoJsonConverter::get_instance());
 
-    const std::shared_ptr<auth_manager::auth::IKeyService> ssl = std::make_shared<auth_manager::auth::KeyServiceImpl>(provider, auth_config, "root");
+    auth_manager::auth::KeyServiceImpl ssl(std::move(provider), json_file_manager);
 
     QApplication a(argc, argv);
 
@@ -34,7 +33,7 @@ int main(int argc, char *argv[]) {
     };
 
     auth_manager::gui::TabInfo tab3 {
-        .widget = new auth_manager::auth::gui::RootKeyManageTab(ssl),
+        .widget = new auth_manager::auth::gui::RootKeyManageTab(&ssl),
         .tab_name = "root_key_manage(test)"
     };
 

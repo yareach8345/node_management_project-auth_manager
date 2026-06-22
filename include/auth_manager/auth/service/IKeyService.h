@@ -35,7 +35,7 @@ namespace auth_manager::auth {
 
         [[nodiscard]] virtual std::filesystem::path private_key_file_path() const = 0;
         [[nodiscard]] virtual std::filesystem::path public_key_file_path() const = 0;
-        [[nodiscard]] virtual std::string export_public_key() const = 0;
+        [[nodiscard]] virtual std::optional<std::string> export_public_key() const = 0;
 
         [[nodiscard]] virtual std::filesystem::path keys_info_file_path() const = 0;
         [[nodiscard]] virtual std::optional<KeysInfo> keys_info() const = 0;

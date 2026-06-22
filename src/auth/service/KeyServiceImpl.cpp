@@ -9,19 +9,16 @@
 #include <filesystem>
 #include <utility>
 
-#include "auth_manager/auth/config/AuthConfig.h"
 #include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
 #include "auth_manager/auth/util/OpenSSLUtil.h"
 
 namespace auth_manager::auth {
     KeyServiceImpl::KeyServiceImpl(
-        std::shared_ptr<key_provider::KeyProvider> key_provider,
-        const AuthConfig &auth_config,
-        const std::string& key_name
+        std::unique_ptr<key_provider::KeyProvider> key_provider,
+        core::json::JsonFileManager<KeysInfo> _json_file_manager
     ):
         _key_provider(std::move(key_provider)),
-        _keys_info_file_path(auth_config.file_base() + "/" + key_name + "/keys_info.json"),
-        _json_file_manager(auth_config.file_base() + "/" + key_name + "/keys_info.json", KeysInfoJsonConverter::get_instance())
+        _json_file_manager(std::move(_json_file_manager))
     {
         if (_key_provider->is_key_loaded() && _json_file_manager.exists()) {
             KeyServiceImpl::load_keys();
@@ -41,7 +38,7 @@ namespace auth_manager::auth {
     }
 
     std::array<std::filesystem::path, 3> KeyServiceImpl::required_files() const {
-        return { _key_provider->private_key_file_path(), _key_provider->public_key_file_path(), _keys_info_file_path };
+        return { _key_provider->private_key_file_path(), _key_provider->public_key_file_path(),  _json_file_manager.file_path() };
     }
 
     void KeyServiceImpl::load_keys() {
@@ -76,9 +73,14 @@ namespace auth_manager::auth {
 
     std::filesystem::path KeyServiceImpl::public_key_file_path() const { return _key_provider->public_key_file_path(); }
 
-    std::string KeyServiceImpl::export_public_key() const { return _key_provider->export_public_key(); }
+    std::optional<std::string> KeyServiceImpl::export_public_key() const {
+        if (!_key_provider->is_key_loaded()) {
+            return std::nullopt;
+        }
+        return _key_provider->export_public_key();
+    }
 
-    std::filesystem::path KeyServiceImpl::keys_info_file_path() const { return _keys_info_file_path; }
+    std::filesystem::path KeyServiceImpl::keys_info_file_path() const { return _json_file_manager.file_path(); }
 
     std::optional<KeysInfo> KeyServiceImpl::keys_info() const { return _keys_info; }
 }
