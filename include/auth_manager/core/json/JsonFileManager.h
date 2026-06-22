@@ -20,7 +20,7 @@ namespace auth_manager::core::json {
 
         std::shared_ptr<JsonConverter<T>> jsonConverter;
     public:
-        explicit JsonFileManager(std::string file_path, std::shared_ptr<JsonConverter<T>> jsonConverter);
+        explicit JsonFileManager(std::filesystem::path file_path, std::shared_ptr<JsonConverter<T>> jsonConverter);
 
         [[nodiscard]] bool exists() const;
 
@@ -30,11 +30,11 @@ namespace auth_manager::core::json {
 
         void delete_file() const;
 
-        std::filesystem::path file_path() const;
+        [[nodiscard]] std::filesystem::path file_path() const;
     };
 
     template<typename T>
-    JsonFileManager<T>::JsonFileManager(std::string file_path, std::shared_ptr<JsonConverter<T>> jsonConverter): _file_path(std::move(file_path)), jsonConverter(jsonConverter) {}
+    JsonFileManager<T>::JsonFileManager(std::filesystem::path file_path, std::shared_ptr<JsonConverter<T>> jsonConverter): _file_path(std::move(file_path)), jsonConverter(jsonConverter) {}
 
     template<typename T>
     bool JsonFileManager<T>::exists() const {
