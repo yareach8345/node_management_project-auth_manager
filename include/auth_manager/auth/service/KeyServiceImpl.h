@@ -25,7 +25,7 @@ namespace auth_manager::auth {
     public:
         explicit KeyServiceImpl(
             std::unique_ptr<key_provider::KeyProvider> key_provider,
-            core::json::JsonFileManager<KeysInfo> _json_file_manager
+            core::json::JsonFileManager<KeysInfo> json_file_manager
         );
 
         ~KeyServiceImpl() override;

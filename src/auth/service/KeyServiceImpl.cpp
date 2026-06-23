@@ -15,10 +15,10 @@
 namespace auth_manager::auth {
     KeyServiceImpl::KeyServiceImpl(
         std::unique_ptr<key_provider::KeyProvider> key_provider,
-        core::json::JsonFileManager<KeysInfo> _json_file_manager
+        core::json::JsonFileManager<KeysInfo> json_file_manager
     ):
         _key_provider(std::move(key_provider)),
-        _json_file_manager(std::move(_json_file_manager))
+        _json_file_manager(std::move(json_file_manager))
     {
         if (_key_provider->is_key_loaded() && _json_file_manager.exists()) {
             KeyServiceImpl::load_keys();
