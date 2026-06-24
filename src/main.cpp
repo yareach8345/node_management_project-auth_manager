@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<auth_manager::auth::key_provider::KeyProvider> provider = std::make_unique<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>(auth_config.file_base(), "root");
     auto json_file_manager = auth_manager::core::json::JsonFileManager(auth_config.file_base() + "/root/keys_info.json", auth_manager::auth::KeysInfoJsonConverter::get_instance());
 
-    auth_manager::auth::KeyServiceImpl ssl(std::move(provider), json_file_manager);
+    auto ssl = std::make_shared<auth_manager::auth::KeyServiceImpl>(std::move(provider), json_file_manager);
 
     QApplication a(argc, argv);
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     };
 
     auth_manager::gui::TabInfo tab3 {
-        .widget = new auth_manager::auth::gui::RootKeyManageTab(&ssl),
+        .widget = new auth_manager::auth::gui::RootKeyManageTab(ssl),
         .tab_name = "root_key_manage(test)"
     };
 

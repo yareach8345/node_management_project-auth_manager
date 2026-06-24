@@ -5,14 +5,12 @@
 #ifndef AUTH_MANAGER_ROOT_KEY_MANAGE_TAB_H
 #define AUTH_MANAGER_ROOT_KEY_MANAGE_TAB_H
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QVBoxLayout>
+#include <QTabWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QPushButton>
 #include <QtCore/QPointer>
-#include <memory>
 
 #include "auth_manager/auth/service/IKeyService.h"
 
@@ -23,9 +21,16 @@ namespace auth_manager::auth::gui {
         QPointer<QVBoxLayout> _main_layout = new QVBoxLayout(this);
         QPointer<QTextBrowser> _key_info_viewer = new QTextBrowser;
 
-        QPointer<QHBoxLayout> _buttons_layout = new QHBoxLayout;
+        QPointer<QHBoxLayout> _buttons_layout = new QHBoxLayout();
         QPointer<QPushButton> _generate_key_button = new QPushButton("Generate Key", this);
         QPointer<QPushButton> _delete_key_button = new QPushButton("Delete Key", this);
+
+        QPointer<QTabWidget> _root_key_task_tap = new QTabWidget(this);
+
+        QPointer<QWidget> _public_key_viewer = new QWidget(this);
+        QPointer<QVBoxLayout> _public_key_viewer_layout = new QVBoxLayout();
+        QPointer<QLabel> _public_key_viewer_label = new QLabel("Public Key", this);
+        QPointer<QTextBrowser> _public_key_viewer_browser = new QTextBrowser(this);
 
         std::shared_ptr<IKeyService> _root_key_service;
 
@@ -38,6 +43,8 @@ namespace auth_manager::auth::gui {
         void on_delete_key_button_clicked();
 
         void update_key_info_viewer();
+
+        void update_public_key_viewer();
     public:
         explicit RootKeyManageTab(const std::shared_ptr<IKeyService> &root_key_service);
     };
