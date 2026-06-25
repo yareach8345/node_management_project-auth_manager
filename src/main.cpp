@@ -7,7 +7,7 @@
 #include "auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h"
 #include "auth_manager/auth/service/IKeyService.h"
 #include "auth_manager/auth/service/KeyServiceImpl.h"
-#include "auth_manager/auth/tab/RootKeyManageTab.h"
+#include "auth_manager/root_key/tab/RootKeyManageTab.h"
 #include "auth_manager/gui/GuiWidget.h"
 #include "auth_manager/gui/TabInfo.h"
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     };
 
     auth_manager::gui::TabInfo tab3 {
-        .widget = new auth_manager::auth::gui::RootKeyManageTab(ssl),
+        .widget = new auth_manager::root_key::RootKeyManageTab(ssl),
         .tab_name = "root_key_manage(test)"
     };
 

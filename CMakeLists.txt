@@ -37,8 +37,8 @@ add_library(auth_manager_lib
         include/auth_manager/gui/GuiWidget.h
         src/gui/GuiWidget.cpp
         include/auth_manager/gui/TabInfo.h
-        include/auth_manager/auth/tab/RootKeyManageTab.h
-        src/auth/tab/RootKeyManageTab.cpp
+        include/auth_manager/root_key/tab/RootKeyManageTab.h
+        src/root_key/tab/RootKeyManageTab.cpp
         include/auth_manager/util/FileUtil.h
         src/util/FileUtil.cpp
 )

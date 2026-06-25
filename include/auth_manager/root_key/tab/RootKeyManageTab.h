@@ -14,7 +14,9 @@
 
 #include "auth_manager/auth/service/IKeyService.h"
 
-namespace auth_manager::auth::gui {
+namespace auth_manager::root_key {
+    using namespace auth_manager;
+
     class RootKeyManageTab: public QWidget {
         Q_OBJECT
     private:
@@ -32,7 +34,7 @@ namespace auth_manager::auth::gui {
         QPointer<QLabel> _public_key_viewer_label = new QLabel("Public Key", this);
         QPointer<QTextBrowser> _public_key_viewer_browser = new QTextBrowser(this);
 
-        std::shared_ptr<IKeyService> _root_key_service;
+        std::shared_ptr<auth::IKeyService> _root_key_service;
 
         void init_layout();
 
@@ -46,7 +48,7 @@ namespace auth_manager::auth::gui {
 
         void update_public_key_viewer();
     public:
-        explicit RootKeyManageTab(const std::shared_ptr<IKeyService> &root_key_service);
+        explicit RootKeyManageTab(const std::shared_ptr<auth::IKeyService> &root_key_service);
     };
 }
 

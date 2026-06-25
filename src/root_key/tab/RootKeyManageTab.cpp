@@ -2,14 +2,12 @@
 // Created by yareach on 26. 6. 7..
 //
 
-#include "auth_manager/auth/tab/RootKeyManageTab.h"
-
+#include "auth_manager/root_key/tab/RootKeyManageTab.h"
 #include <QTabWidget>
-
 #include "auth_manager/auth/mapping/KeysInfoJsonConverter.h"
 
-namespace auth_manager::auth::gui {
-    RootKeyManageTab::RootKeyManageTab(const std::shared_ptr<IKeyService> &root_key_service):
+namespace auth_manager::root_key {
+    RootKeyManageTab::RootKeyManageTab(const std::shared_ptr<auth::IKeyService> &root_key_service):
         _root_key_service(root_key_service)
     {
         init_layout();
@@ -53,8 +51,8 @@ namespace auth_manager::auth::gui {
 
     void RootKeyManageTab::update_key_info_viewer() {
         const std::string keys_info_string = _root_key_service->keys_info()
-            .transform([](const KeysInfo& info) {
-                return KeysInfoJsonConverter::get_instance()->serialize(info, 4);
+            .transform([](const auth::KeysInfo& info) {
+                return auth::KeysInfoJsonConverter::get_instance()->serialize(info, 4);
             }).value_or("Key is not loaded");
         _key_info_viewer->setText(keys_info_string.c_str());
     }
