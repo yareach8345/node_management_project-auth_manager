@@ -41,6 +41,10 @@ add_library(auth_manager_lib
         src/root_key/tab/RootKeyManageTab.cpp
         include/auth_manager/util/FileUtil.h
         src/util/FileUtil.cpp
+        include/auth_manager/auth/factory/key_provider_factory.h
+        include/auth_manager/root_key/factory/root_key_service_factory.h
+        src/auth/factory/key_provider_factory.cpp
+        src/root_key/factory/root_key_service_factory.cpp
 )
 
 target_include_directories(auth_manager_lib

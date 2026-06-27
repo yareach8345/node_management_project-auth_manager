@@ -4,21 +4,17 @@
 
 #include "auth_manager/auth/config/AuthConfig.h"
 #include "auth_manager/auth/key_provider/KeyProvider.h"
-#include "auth_manager/auth/key_provider/KeyProviderOpenSSLImpl.h"
 #include "auth_manager/auth/service/IKeyService.h"
-#include "auth_manager/auth/service/KeyServiceImpl.h"
 #include "auth_manager/root_key/tab/RootKeyManageTab.h"
 #include "auth_manager/gui/GuiWidget.h"
 #include "auth_manager/gui/TabInfo.h"
+#include "auth_manager/root_key/factory/root_key_service_factory.h"
 
 int main(int argc, char *argv[]) {
     YAML::Node config = YAML::LoadFile(CONFIG_FILE_PATH);
     const auth_manager::auth::AuthConfig auth_config(config);
 
-    std::unique_ptr<auth_manager::auth::key_provider::KeyProvider> provider = std::make_unique<auth_manager::auth::key_provider::KeyProviderOpenSSLImpl>(auth_config.file_base(), "root");
-    auto json_file_manager = auth_manager::core::json::JsonFileManager(auth_config.file_base() + "/root/keys_info.json", auth_manager::auth::KeysInfoJsonConverter::get_instance());
-
-    auto ssl = std::make_shared<auth_manager::auth::KeyServiceImpl>(std::move(provider), json_file_manager);
+    const std::shared_ptr<auth_manager::auth::IKeyService> root_key_service(auth_manager::root_key::generate_root_key_service(auth_config));
 
     QApplication a(argc, argv);
 
@@ -33,7 +29,7 @@ int main(int argc, char *argv[]) {
     };
 
     auth_manager::gui::TabInfo tab3 {
-        .widget = new auth_manager::root_key::RootKeyManageTab(ssl),
+        .widget = new auth_manager::root_key::RootKeyManageTab(root_key_service),
         .tab_name = "root_key_manage(test)"
     };
 
