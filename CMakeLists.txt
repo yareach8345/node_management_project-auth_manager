@@ -45,6 +45,8 @@ add_library(auth_manager_lib
         include/auth_manager/root_key/factory/root_key_service_factory.h
         src/auth/factory/key_provider_factory.cpp
         src/root_key/factory/root_key_service_factory.cpp
+        include/auth_manager/root_key/gui/PublicKeyViewer.h
+        src/root_key/gui/PublicKeyViewer.cpp
 )
 
 target_include_directories(auth_manager_lib

@@ -8,7 +8,8 @@
 
 namespace auth_manager::root_key {
     RootKeyManageTab::RootKeyManageTab(const std::shared_ptr<auth::IKeyService> &root_key_service):
-        _root_key_service(root_key_service)
+        _root_key_service(root_key_service),
+        _public_key_viewer(new PublicKeyViewer(root_key_service, this))
     {
         init_layout();
         connect_event();
@@ -25,9 +26,6 @@ namespace auth_manager::root_key {
 
         _main_layout->addWidget(_root_key_task_tap);
         _root_key_task_tap->addTab(_public_key_viewer, "Public Key Viewer");
-        _public_key_viewer->setLayout(_public_key_viewer_layout);
-        _public_key_viewer_layout->addWidget(_public_key_viewer_label);
-        _public_key_viewer_layout->addWidget(_public_key_viewer_browser);
 
         setLayout(_main_layout);
     }
@@ -58,7 +56,6 @@ namespace auth_manager::root_key {
     }
 
     void RootKeyManageTab::update_public_key_viewer() {
-        const std::string public_key = _root_key_service->export_public_key().value_or("Key is not loaded");
-        _public_key_viewer_browser->setText(public_key.c_str());
+        _public_key_viewer->updated();
     }
 }

@@ -13,6 +13,7 @@
 #include <QtCore/QPointer>
 
 #include "auth_manager/auth/service/IKeyService.h"
+#include "auth_manager/root_key/gui/PublicKeyViewer.h"
 
 namespace auth_manager::root_key {
     using namespace auth_manager;
@@ -29,10 +30,7 @@ namespace auth_manager::root_key {
 
         QPointer<QTabWidget> _root_key_task_tap = new QTabWidget(this);
 
-        QPointer<QWidget> _public_key_viewer = new QWidget(this);
-        QPointer<QVBoxLayout> _public_key_viewer_layout = new QVBoxLayout();
-        QPointer<QLabel> _public_key_viewer_label = new QLabel("Public Key", this);
-        QPointer<QTextBrowser> _public_key_viewer_browser = new QTextBrowser(this);
+        QPointer<PublicKeyViewer> _public_key_viewer;
 
         std::shared_ptr<auth::IKeyService> _root_key_service;
 
