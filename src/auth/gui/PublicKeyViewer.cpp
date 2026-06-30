@@ -4,10 +4,10 @@
 
 #include <utility>
 
-#include "auth_manager/root_key/gui/PublicKeyViewer.h"
+#include "auth_manager/auth/gui/PublicKeyViewer.h"
 
-namespace auth_manager::root_key {
-    PublicKeyViewer::PublicKeyViewer(std::shared_ptr<auth::IKeyService> _root_key_service, QWidget *parent):
+namespace auth_manager::auth::gui {
+    PublicKeyViewer::PublicKeyViewer(std::shared_ptr<IKeyService> _root_key_service, QWidget *parent):
         QWidget(parent),
         _root_key_service(std::move(_root_key_service))
     {

@@ -45,8 +45,9 @@ add_library(auth_manager_lib
         include/auth_manager/root_key/factory/root_key_service_factory.h
         src/auth/factory/key_provider_factory.cpp
         src/root_key/factory/root_key_service_factory.cpp
-        include/auth_manager/root_key/gui/PublicKeyViewer.h
-        src/root_key/gui/PublicKeyViewer.cpp
+        include/auth_manager/auth/gui/PublicKeyViewer.h
+        src/auth/gui/PublicKeyViewer.cpp
+        src/auth/gui/KeyInfoViewer.cpp
 )
 
 target_include_directories(auth_manager_lib
@@ -68,6 +69,7 @@ target_link_libraries(auth_manager_lib
 # 실행 파일 선언
 add_executable(auth_manager
         src/main.cpp
+        include/auth_manager/auth/gui/KeyInfoViewer.h
 )
 
 target_link_libraries(auth_manager

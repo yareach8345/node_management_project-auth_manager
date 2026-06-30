@@ -13,7 +13,7 @@
 
 #include "auth_manager/auth/service/IKeyService.h"
 
-namespace auth_manager::root_key {
+namespace auth_manager::auth::gui {
     class PublicKeyViewer : public QWidget {
         Q_OBJECT
     private:
@@ -21,14 +21,14 @@ namespace auth_manager::root_key {
         QPointer<QLabel> _label = new QLabel("Public Key", this);
         QPointer<QTextBrowser> _viewer_browser = new QTextBrowser(this);
 
-        std::shared_ptr<auth::IKeyService> _root_key_service;
+        std::shared_ptr<IKeyService> _root_key_service;
 
         void init_layout();
 
         void update_key_viewer_browser();
 
     public:
-        explicit PublicKeyViewer(std::shared_ptr<auth::IKeyService> _root_key_service, QWidget* parent = nullptr);
+        explicit PublicKeyViewer(std::shared_ptr<IKeyService> _root_key_service, QWidget* parent = nullptr);
 
         void updated();
     };

@@ -6,14 +6,11 @@
 #define AUTH_MANAGER_ROOT_KEY_MANAGE_TAB_H
 
 #include <QTabWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QPushButton>
-#include <QtCore/QPointer>
 
+#include "auth_manager/auth/gui/KeyInfoViewer.h"
 #include "auth_manager/auth/service/IKeyService.h"
-#include "auth_manager/root_key/gui/PublicKeyViewer.h"
+#include "auth_manager/auth/gui/PublicKeyViewer.h"
 
 namespace auth_manager::root_key {
     using namespace auth_manager;
@@ -22,7 +19,7 @@ namespace auth_manager::root_key {
         Q_OBJECT
     private:
         QPointer<QVBoxLayout> _main_layout = new QVBoxLayout(this);
-        QPointer<QTextBrowser> _key_info_viewer = new QTextBrowser;
+        QPointer<auth::gui::KeyInfoViewer> _key_info_viewer;
 
         QPointer<QHBoxLayout> _buttons_layout = new QHBoxLayout();
         QPointer<QPushButton> _generate_key_button = new QPushButton("Generate Key", this);
@@ -30,7 +27,7 @@ namespace auth_manager::root_key {
 
         QPointer<QTabWidget> _root_key_task_tap = new QTabWidget(this);
 
-        QPointer<PublicKeyViewer> _public_key_viewer;
+        QPointer<auth::gui::PublicKeyViewer> _public_key_viewer;
 
         std::shared_ptr<auth::IKeyService> _root_key_service;
 
