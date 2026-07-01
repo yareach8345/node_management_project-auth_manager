@@ -9,9 +9,10 @@
 
 namespace auth_manager::root_key {
     RootKeyManageTab::RootKeyManageTab(const std::shared_ptr<auth::IKeyService> &root_key_service):
-        _root_key_service(root_key_service),
+        _key_info_viewer(new auth::gui::KeyInfoViewer(root_key_service, this)),
         _public_key_viewer(new auth::gui::PublicKeyViewer(root_key_service, this)),
-        _key_info_viewer(new auth::gui::KeyInfoViewer(root_key_service, this))
+        _message_sign(new auth::gui::MessageSign(root_key_service, this)),
+        _root_key_service(root_key_service)
     {
         init_layout();
         connect_event();
@@ -28,6 +29,7 @@ namespace auth_manager::root_key {
 
         _main_layout->addWidget(_root_key_task_tap);
         _root_key_task_tap->addTab(_public_key_viewer, "Public Key Viewer");
+        _root_key_task_tap->addTab(_message_sign, "Message Sign Test");
 
         setLayout(_main_layout);
     }

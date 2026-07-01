@@ -48,6 +48,10 @@ add_library(auth_manager_lib
         include/auth_manager/auth/gui/PublicKeyViewer.h
         src/auth/gui/PublicKeyViewer.cpp
         src/auth/gui/KeyInfoViewer.cpp
+        include/auth_manager/auth/gui/MessageSign.h
+        src/auth/gui/MessageSign.cpp
+        include/auth_manager/util/EncodeUtil.h
+        src/util/EncodeUtil.cpp
 )
 
 target_include_directories(auth_manager_lib

@@ -9,6 +9,7 @@
 #include <QtWidgets/QPushButton>
 
 #include "auth_manager/auth/gui/KeyInfoViewer.h"
+#include "auth_manager/auth/gui/MessageSign.h"
 #include "auth_manager/auth/service/IKeyService.h"
 #include "auth_manager/auth/gui/PublicKeyViewer.h"
 
@@ -28,6 +29,7 @@ namespace auth_manager::root_key {
         QPointer<QTabWidget> _root_key_task_tap = new QTabWidget(this);
 
         QPointer<auth::gui::PublicKeyViewer> _public_key_viewer;
+        QPointer<auth::gui::MessageSign> _message_sign;
 
         std::shared_ptr<auth::IKeyService> _root_key_service;
 
