@@ -12,12 +12,12 @@ namespace auth_manager::root_key {
         _key_info_viewer(new auth::gui::KeyInfoViewer(root_key_service, this)),
         _public_key_viewer(new auth::gui::PublicKeyViewer(root_key_service, this)),
         _message_sign(new auth::gui::MessageSign(root_key_service, this)),
+        _message_verify(new auth::gui::MessageVerify(root_key_service, this)),
         _root_key_service(root_key_service)
     {
         init_layout();
         connect_event();
-        update_key_info_viewer();
-        update_public_key_viewer();
+        key_updated();
     }
 
     void RootKeyManageTab::init_layout() {
@@ -30,6 +30,7 @@ namespace auth_manager::root_key {
         _main_layout->addWidget(_root_key_task_tap);
         _root_key_task_tap->addTab(_public_key_viewer, "Public Key Viewer");
         _root_key_task_tap->addTab(_message_sign, "Message Sign Test");
+        _root_key_task_tap->addTab(_message_verify, "Message Sign Test");
 
         setLayout(_main_layout);
     }
@@ -40,22 +41,21 @@ namespace auth_manager::root_key {
     }
 
     void RootKeyManageTab::on_generate_key_button_clicked() {
+        qDebug() << "Generate Key Button is clicked";
         _root_key_service->generate_new_keys();
-        update_key_info_viewer();
-        update_public_key_viewer();
+        key_updated();
     }
 
     void RootKeyManageTab::on_delete_key_button_clicked() {
+        qDebug() << "Delete Key Button is clicked";
         _root_key_service->delete_keys();
-        update_key_info_viewer();
-        update_public_key_viewer();
+        key_updated();
     }
 
-    void RootKeyManageTab::update_key_info_viewer() {
+    void RootKeyManageTab::key_updated() {
         _key_info_viewer->updated();
-    }
-
-    void RootKeyManageTab::update_public_key_viewer() {
         _public_key_viewer->updated();
+        _message_sign->updated();
+        _message_verify->updated();
     }
 }

@@ -13,7 +13,7 @@ namespace auth_manager::util {
     public:
         static std::string base64_encode(const std::vector<std::byte> &bytes);
 
-        // static std::vector<std::byte> base64_decode(const std::string &encoded_string);
+        static std::vector<std::byte> base64_decode(const std::string &encoded_string);
     };
 }
 

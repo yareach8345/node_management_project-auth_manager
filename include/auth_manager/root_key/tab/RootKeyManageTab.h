@@ -10,6 +10,7 @@
 
 #include "auth_manager/auth/gui/KeyInfoViewer.h"
 #include "auth_manager/auth/gui/MessageSign.h"
+#include "auth_manager/auth/gui/MessageVerify.h"
 #include "auth_manager/auth/service/IKeyService.h"
 #include "auth_manager/auth/gui/PublicKeyViewer.h"
 
@@ -30,6 +31,7 @@ namespace auth_manager::root_key {
 
         QPointer<auth::gui::PublicKeyViewer> _public_key_viewer;
         QPointer<auth::gui::MessageSign> _message_sign;
+        QPointer<auth::gui::MessageVerify> _message_verify;
 
         std::shared_ptr<auth::IKeyService> _root_key_service;
 
@@ -41,9 +43,7 @@ namespace auth_manager::root_key {
 
         void on_delete_key_button_clicked();
 
-        void update_key_info_viewer();
-
-        void update_public_key_viewer();
+        void key_updated();
     public:
         explicit RootKeyManageTab(const std::shared_ptr<auth::IKeyService> &root_key_service);
     };

@@ -52,6 +52,8 @@ add_library(auth_manager_lib
         src/auth/gui/MessageSign.cpp
         include/auth_manager/util/EncodeUtil.h
         src/util/EncodeUtil.cpp
+        include/auth_manager/auth/gui/MessageVerify.h
+        src/auth/gui/MessageVerify.cpp
 )
 
 target_include_directories(auth_manager_lib

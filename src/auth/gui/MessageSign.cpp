@@ -28,7 +28,6 @@ namespace auth_manager::auth::gui {
         const QPointer input_layout = new QVBoxLayout;
         _sign_layout->addLayout(input_layout);
         const QPointer input_label = new QLabel("Message");
-        input_label->setAlignment(Qt::AlignCenter);
         input_layout->addWidget(input_label);
         input_layout->addWidget(_input);
 
@@ -37,7 +36,6 @@ namespace auth_manager::auth::gui {
         const QPointer output_layout = new QVBoxLayout;
         _sign_layout->addLayout(output_layout);
         const QPointer output_label = new QLabel("Signed Message(Base 64)");
-        output_label->setAlignment(Qt::AlignCenter);
         output_layout->addWidget(output_label);
         output_layout->addWidget(_output);
     }
@@ -62,7 +60,9 @@ namespace auth_manager::auth::gui {
     }
 
     void MessageSign::update_input_enable() {
-        _input->setEnabled(_key_service->is_key_loaded());
+        const auto is_key_loaded = _key_service->is_key_loaded();
+        _input->setEnabled(is_key_loaded);
+        _output->setEnabled(is_key_loaded);
     }
 
     void MessageSign::updated() {
